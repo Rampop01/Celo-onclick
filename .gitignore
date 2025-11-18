@@ -1,0 +1,21 @@
+# Foundry
+out/
+cache/
+broadcast/
+lib/
+*.sol
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+

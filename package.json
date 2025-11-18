@@ -1,0 +1,25 @@
+{
+  "name": "onclick-smartcontract",
+  "version": "1.0.0",
+  "description": "OnClick universal payment platform smart contract",
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "test:verbose": "forge test -vvv",
+    "coverage": "forge coverage",
+    "lint": "forge fmt --check",
+    "format": "forge fmt",
+    "deploy:local": "forge script script/Deploy.s.sol:DeployScript --rpc-url http://localhost:8545 --broadcast",
+    "deploy:sepolia": "forge script script/Deploy.s.sol:DeployScript --rpc-url $SEPOLIA_RPC_URL --broadcast --verify"
+  },
+  "keywords": [
+    "solidity",
+    "foundry",
+    "smart-contract",
+    "payments",
+    "web3"
+  ],
+  "author": "",
+  "license": "MIT"
+}
+
