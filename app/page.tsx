@@ -84,7 +84,7 @@ const DiamondCard = ({
     whileHover={{ scale: 1.04 }}
     className={`absolute h-48 w-48 md:h-56 md:w-56 ${positionClass}`}
   >
-    <div className="absolute inset-0 rotate-45 rounded-[32px] bg-white shadow-xl shadow-blue-100/60 border border-slate-200 flex items-center justify-center">
+    <div className="absolute inset-0 rotate-45 rounded-[32px] bg-white shadow-2xl shadow-slate-900/40 border border-slate-200 flex items-center justify-center">
       <div className="-rotate-45 px-6 text-center">
         <h3 className="text-lg font-semibold text-slate-900 mb-2">{feature.title}</h3>
         <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>

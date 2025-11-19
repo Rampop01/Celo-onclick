@@ -79,9 +79,31 @@ export const dummyData = {
 };
 
 export const paymentMethods = [
-  { id: 'card', name: 'Credit/Debit Card', icon: '💳', provider: 'Transak' },
-  { id: 'wallet', name: 'Polkadot Wallet', icon: '🔗', provider: 'Polkadot.js' },
-  { id: 'crypto', name: 'Direct Crypto', icon: '₿', provider: 'Direct' }
+  { 
+    id: 'card', 
+    name: 'Credit/Debit Card', 
+    icon: '💳', 
+    provider: 'Circle/Stripe',
+    description: 'Pay with your bank card',
+    type: 'fiat'
+  },
+  { 
+    id: 'minipay', 
+    name: 'MiniPay', 
+    icon: '📱', 
+    provider: 'Celo',
+    description: 'Fast, phone-based wallet (Recommended)',
+    type: 'crypto',
+    featured: true
+  },
+  { 
+    id: 'wallet', 
+    name: 'Web3 Wallet', 
+    icon: '🦊', 
+    provider: 'MetaMask/WalletConnect',
+    description: 'Connect any crypto wallet',
+    type: 'crypto'
+  }
 ];
 
 export const currencies = [

@@ -46,7 +46,7 @@ export default function Navbar() {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/20"
+      className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/20 dark:border-gray-700/20"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
@@ -59,33 +59,13 @@ export default function Navbar() {
               <div className="w-10 h-10 primary-gradient rounded-xl flex items-center justify-center shadow-lg">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-black text-slate-900">
+              <span className="text-2xl font-black text-slate-900 dark:text-white">
                 OnClick
               </span>
             </motion.div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a
-              href="#features"
-              className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
-            >
-              Features
-            </a>
-            <a
-              href="#how-it-works"
-              className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
-            >
-              How it Works
-            </a>
-            <a
-              href="#pricing"
-              className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
-            >
-              Pricing
-            </a>
-          </div>
+          {/* Desktop Navigation - Removed for now */}
 
           {/* Right side buttons */}
           <div className="flex items-center space-x-4">
@@ -97,35 +77,24 @@ export default function Navbar() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
-              className="p-3 rounded-xl bg-white/50 hover:bg-white/80 transition-colors shadow-sm"
+              className="p-3 rounded-xl bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 transition-colors shadow-sm"
             >
               {isDark ? (
                 <Sun className="w-5 h-5 text-amber-500" />
               ) : (
-                <Moon className="w-5 h-5 text-slate-600" />
+                <Moon className="w-5 h-5 text-slate-600 dark:text-gray-300" />
               )}
             </motion.button>
-
-            {/* Get Started Button */}
-            <Link href="/role-selection">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn-primary px-6 py-3 font-semibold"
-              >
-                Get Started
-              </motion.button>
-            </Link>
 
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-3 rounded-xl bg-white/50 hover:bg-white/80 transition-colors shadow-sm"
+              className="md:hidden p-3 rounded-xl bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 transition-colors shadow-sm"
             >
               {isMenuOpen ? (
-                <X className="w-5 h-5 text-slate-600" />
+                <X className="w-5 h-5 text-slate-600 dark:text-gray-300" />
               ) : (
-                <Menu className="w-5 h-5 text-slate-600" />
+                <Menu className="w-5 h-5 text-slate-600 dark:text-gray-300" />
               )}
             </button>
           </div>
@@ -137,38 +106,12 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden py-6 border-t border-white/20"
+            className="md:hidden py-6 border-t border-white/20 dark:border-gray-700/20"
           >
             <div className="flex flex-col space-y-4">
-              <a
-                href="#features"
-                className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Features
-              </a>
-              <a
-                href="#how-it-works"
-                className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                How it Works
-              </a>
-              <a
-                href="#pricing"
-                className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Pricing
-              </a>
               <div className="pt-2">
                 <WalletButton />
               </div>
-              <Link href="/role-selection">
-                <button className="w-full btn-primary py-3 font-semibold">
-                  Get Started
-                </button>
-              </Link>
             </div>
           </motion.div>
         )}

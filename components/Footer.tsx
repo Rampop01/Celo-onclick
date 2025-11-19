@@ -150,7 +150,7 @@ export default function Footer() {
         <div className="border-t border-white/20 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-blue-100 text-sm font-medium">
-              © 2025 OnClick | Powered by Polkadot
+              © 2025 OnClick | Powered by Celo
             </p>
             <div className="flex space-x-8 mt-4 md:mt-0">
               <a

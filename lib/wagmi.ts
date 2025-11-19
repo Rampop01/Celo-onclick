@@ -1,5 +1,5 @@
 import { cookieStorage, createStorage, http } from 'wagmi'
-import { mainnet, sepolia } from 'wagmi/chains'
+import { mainnet, sepolia, celo } from 'wagmi/chains'
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 
@@ -14,8 +14,8 @@ const metadata = {
   icons: ['https://onclick.app/favicon.ico']
 }
 
-// Define the chains
-const chains = [mainnet, sepolia] as const
+// Define the chains - Added Celo for MiniPay integration
+const chains = [mainnet, sepolia, celo] as const
 
 // Create wagmi adapter with chains and projectId
 const wagmiAdapter = new WagmiAdapter({
