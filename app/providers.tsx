@@ -1,6 +1,9 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WagmiProvider } from 'wagmi';
+import { wagmiConfig } from '../lib/wagmi';
 
 interface ThemeContextType {
   isDark: boolean;
@@ -16,6 +19,17 @@ export function useTheme() {
   }
   return context;
 }
+
+// Create a QueryClient instance for wagmi
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 60 * 1000, // 1 minute
+    },
+  },
+});
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState(false);
@@ -40,8 +54,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+          {children}
+        </ThemeContext.Provider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }

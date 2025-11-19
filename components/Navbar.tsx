@@ -6,6 +6,7 @@ import { useTheme } from '../app/providers';
 import { usePathname } from 'next/navigation';
 import { Sun, Moon, Menu, X, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import WalletButton from './WalletButton';
 
 export default function Navbar() {
   const { isDark, toggleTheme } = useTheme();
@@ -88,6 +89,9 @@ export default function Navbar() {
 
           {/* Right side buttons */}
           <div className="flex items-center space-x-4">
+            {/* Wallet Button */}
+            <WalletButton />
+
             {/* Theme Toggle */}
             <motion.button
               whileHover={{ scale: 1.1 }}
@@ -157,6 +161,9 @@ export default function Navbar() {
               >
                 Pricing
               </a>
+              <div className="pt-2">
+                <WalletButton />
+              </div>
               <Link href="/role-selection">
                 <button className="w-full btn-primary py-3 font-semibold">
                   Get Started
