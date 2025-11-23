@@ -1,8 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useGetPage, useGetPayments, usePaymentFlow, useUSDCBalance } from '../../hooks/useContract';
+import { fromUSDCAmount } from '../../lib/contract';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { 
@@ -59,6 +61,22 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'fiat' | 'crypto' | null>(null);
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [embedCodeCopied, setEmbedCodeCopied] = useState(false);
+
+  // On-chain data hooks
+  const { page: onChainPage, isLoading: pageLoading, error: pageError, refetch: refetchPage } = useGetPage(handleFromUrl || undefined);
+  const { payments: onChainPayments, isLoading: paymentsLoading, refetch: refetchPayments } = useGetPayments(handleFromUrl || undefined);
+  const { balanceFormatted } = useUSDCBalance();
+  const { startPayment, step: paymentStep, isSuccess: paymentIsSuccess, errorMessage: paymentErrorMessage, reset: resetPayment } = usePaymentFlow();
+
+  // Auto-refetch when payment succeeds
+  useEffect(() => {
+    if (paymentIsSuccess) {
+      setTimeout(() => {
+        refetchPage();
+        refetchPayments();
+      }, 2000);
+    }
+  }, [paymentIsSuccess, refetchPage, refetchPayments]);
 
   // Get form data from localStorage by handle or use defaults
   const getSavedFormData = () => {

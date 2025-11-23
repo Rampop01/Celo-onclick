@@ -5,6 +5,9 @@ import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import { useAccount } from 'wagmi';
+import { useCreatePage, useIsHandleAvailable } from '../../hooks/useContract';
+import { Role } from '../../lib/contract';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -36,6 +39,10 @@ function CreatePageContent() {
   const nameFromUrl = (searchParams && searchParams.get('name')) || '';
   const handleFromUrl = (searchParams && searchParams.get('handle')) || '';
   const stepFromUrl = (searchParams && searchParams.get('step')) || '';
+  
+  // Contract hooks
+  const { address, isConnected } = useAccount();
+  const { createPage, isPending: isCreating, isConfirming, isSuccess: isPageCreated, error: createError, hash } = useCreatePage();
   
   // Get saved data from localStorage (from handle selection page)
   const getSavedData = () => {
@@ -84,7 +91,29 @@ function CreatePageContent() {
 
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
   const [handleAvailability, setHandleAvailability] = useState<'available' | 'unavailable' | 'checking' | null>(null);
+  const [showPublishModal, setShowPublishModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle successful page creation
+  useEffect(() => {
+    if (isPageCreated && hash) {
+      // Save form data to localStorage
+      if (typeof window !== 'undefined' && formData.handle) {
+        localStorage.setItem(`onclick_page_${formData.handle}`, JSON.stringify({
+          ...formData,
+          contractTxHash: hash,
+          published: true
+        }));
+        localStorage.setItem('onclick_page_data', JSON.stringify(formData));
+        sessionStorage.setItem(`onclick_page_owner_${formData.handle}`, 'true');
+        sessionStorage.setItem('onclick_page_owner', 'true');
+      }
+      // Show success modal briefly then navigate
+      setTimeout(() => {
+        router.push(`/${formData.handle}`);
+      }, 2000);
+    }
+  }, [isPageCreated, hash, formData.handle, router]);
 
   // Reload saved data when component mounts or when navigating back from preview
   useEffect(() => {
@@ -844,30 +873,66 @@ function CreatePageContent() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={currentStep === 4 ? () => {
-                    // Save form data to localStorage
-                    if (typeof window !== 'undefined' && formData.handle) {
-                      // Save by handle for handle-based routing
-                      localStorage.setItem(`onclick_page_${formData.handle}`, JSON.stringify(formData));
-                      // Also save to general key for backward compatibility
-                      localStorage.setItem('onclick_page_data', JSON.stringify(formData));
-                      // Set flag to indicate user is the page owner
-                      sessionStorage.setItem(`onclick_page_owner_${formData.handle}`, 'true');
-                      sessionStorage.setItem('onclick_page_owner', 'true');
-                      // Navigate to handle-based URL
-                      router.push(`/${formData.handle}`);
-                    } else {
-                      // Fallback to old URL format if no handle
-                      localStorage.setItem('onclick_page_data', JSON.stringify(formData));
-                      sessionStorage.setItem('onclick_page_owner', 'true');
-                      router.push(`/public-page?role=${formData.role}&layout=${formData.layout}&owner=true`);
+                  onClick={currentStep === 4 ? async () => {
+                    if (!isConnected) {
+                      alert('Please connect your wallet first!');
+                      return;
+                    }
+                    
+                    if (!formData.walletAddress || !formData.handle) {
+                      alert('Please fill in all required fields');
+                      return;
+                    }
+
+                    // Convert role string to enum
+                    let roleEnum: Role;
+                    switch (formData.role) {
+                      case 'creator':
+                        roleEnum = Role.Creator;
+                        break;
+                      case 'business':
+                        roleEnum = Role.Business;
+                        break;
+                      case 'crowdfunder':
+                        roleEnum = Role.Crowdfunder;
+                        break;
+                      default:
+                        roleEnum = Role.Creator;
+                    }
+
+                    // Convert goal and deadline
+                    const goalAmount = formData.goal ? parseFloat(formData.goal) : 0;
+                    const deadlineTimestamp = formData.deadline ? new Date(formData.deadline).getTime() : 0;
+
+                    try {
+                      await createPage(
+                        formData.handle,
+                        roleEnum,
+                        formData.walletAddress,
+                        goalAmount,
+                        deadlineTimestamp
+                      );
+                      setShowPublishModal(true);
+                    } catch (error: any) {
+                      console.error('Error creating page:', error);
+                      alert('Failed to create page: ' + (error.message || 'Unknown error'));
                     }
                   } : handleNext}
                   className="btn-primary px-8 py-3 flex items-center space-x-2"
+                  disabled={isCreating || isConfirming}
                 >
-                  <span>{currentStep === 4 ? 'Publish Page' : 'Next'}</span>
-                  {currentStep < 4 && <ArrowRight className="w-5 h-5" />}
-                  {currentStep === 4 && <Sparkles className="w-5 h-5" />}
+                  {isCreating || isConfirming ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>{isConfirming ? 'Confirming...' : 'Creating...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{currentStep === 4 ? 'Publish Page' : 'Next'}</span>
+                      {currentStep < 4 && <ArrowRight className="w-5 h-5" />}
+                      {currentStep === 4 && <Sparkles className="w-5 h-5" />}
+                    </>
+                  )}
                 </motion.button>
               </div>
             </div>
@@ -876,6 +941,86 @@ function CreatePageContent() {
       </div>
 
       <Footer />
+
+      {/* Transaction Status Modal */}
+      <AnimatePresence>
+        {(showPublishModal || isCreating || isConfirming || isPageCreated) && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl text-center"
+            >
+              {isCreating && (
+                <>
+                  <Loader2 className="w-16 h-16 mx-auto mb-4 text-blue-500 animate-spin" />
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    Creating Your Page
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Please confirm the transaction in your wallet...
+                  </p>
+                </>
+              )}
+
+              {isConfirming && (
+                <>
+                  <Loader2 className="w-16 h-16 mx-auto mb-4 text-blue-500 animate-spin" />
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    Confirming Transaction
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Waiting for blockchain confirmation...
+                  </p>
+                </>
+              )}
+
+              {isPageCreated && (
+                <>
+                  <CheckCircle2 className="w-16 h-16 mx-auto mb-4 text-green-500" />
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    Page Created Successfully!
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    Your page is live on the blockchain
+                  </p>
+                  {hash && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                      Tx: {hash.slice(0, 10)}...{hash.slice(-8)}
+                    </p>
+                  )}
+                </>
+              )}
+
+              {createError && (
+                <>
+                  <X className="w-16 h-16 mx-auto mb-4 text-red-500" />
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    Transaction Failed
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    {createError.message || 'An error occurred'}
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowPublishModal(false)}
+                    className="btn-primary px-6 py-2"
+                  >
+                    Try Again
+                  </motion.button>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

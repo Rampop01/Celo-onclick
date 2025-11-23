@@ -1,10 +1,14 @@
-import { cookieStorage, createStorage, http } from 'wagmi'
+import { cookieStorage, createStorage } from 'wagmi'
 import { mainnet, sepolia, celo } from 'wagmi/chains'
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { celoSepolia } from './contract'
 
 // Get your projectId from https://cloud.reown.com
 export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || 'fe72915b3fa7b7e81b11cc99a79a433e'
+
+// Check if we're in production
+const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production'
 
 // Set the metadata for your app
 const metadata = {
@@ -14,8 +18,13 @@ const metadata = {
   icons: ['https://onclick.app/favicon.ico']
 }
 
-// Define the chains - Added Celo for MiniPay integration
-const chains = [mainnet, sepolia, celo] as const
+// Define the chains - Include both testnet and mainnet
+const chains = [
+  mainnet,
+  sepolia,
+  celo,
+  celoSepolia, // Added Celo Sepolia testnet
+] as const
 
 // Create wagmi adapter with chains and projectId
 const wagmiAdapter = new WagmiAdapter({
@@ -32,9 +41,11 @@ export const appKit = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
   metadata,
-  networks: chains
+  networks: chains,
+  features: {
+    analytics: true,
+  },
 })
 
 // Export the wagmi config
 export const wagmiConfig = wagmiAdapter.wagmiConfig
-

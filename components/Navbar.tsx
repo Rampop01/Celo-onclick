@@ -9,9 +9,43 @@ import Link from 'next/link';
 import WalletButton from './WalletButton';
 
 export default function Navbar() {
-  const { isDark, toggleTheme } = useTheme();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const pathname = usePathname();
+  
+  // Use context only if available
+  let theme: any = null;
+  try {
+    theme = useTheme();
+  } catch (e) {
+    // Theme context not available yet, will use state
+  }
+  
+  useEffect(() => {
+    setMounted(true);
+    // Get initial theme from localStorage or system preference
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    setIsDark(shouldBeDark);
+  }, []);
+  
+  const toggleTheme = () => {
+    const newDark = !isDark;
+    setIsDark(newDark);
+    localStorage.setItem('theme', newDark ? 'dark' : 'light');
+    if (newDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+  
+  // Use provided theme if available, otherwise use local state
+  const currentIsDark = theme?.isDark ?? isDark;
+  const currentToggleTheme = theme?.toggleTheme ?? toggleTheme;
+  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Get the handle from the current path or localStorage
   const getHandle = () => {
@@ -76,10 +110,10 @@ export default function Navbar() {
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={toggleTheme}
+              onClick={currentToggleTheme}
               className="p-3 rounded-xl bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 transition-colors shadow-sm"
             >
-              {isDark ? (
+              {currentIsDark ? (
                 <Sun className="w-5 h-5 text-amber-500" />
               ) : (
                 <Moon className="w-5 h-5 text-slate-600 dark:text-gray-300" />

@@ -33,8 +33,10 @@ const queryClient = new QueryClient({
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setIsDark(savedTheme === 'dark' || (!savedTheme && prefersDark));
@@ -52,6 +54,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const toggleTheme = () => {
     setIsDark(!isDark);
   };
+
+  // Prevent hydration mismatch
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <WagmiProvider config={wagmiConfig}>

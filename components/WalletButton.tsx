@@ -51,7 +51,7 @@ export default function WalletButton() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleOpenAccount}
-          className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-full font-semibold text-base flex items-center space-x-2 hover:shadow-lg transition-shadow"
+          className="px-4 py-2.5 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-full font-semibold text-base flex items-center space-x-2 hover:shadow-lg transition-shadow"
         >
           <span>{formatAddress(address)}</span>
         </motion.button>
@@ -75,7 +75,7 @@ export default function WalletButton() {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={handleConnect}
-      className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-full font-semibold text-base flex items-center space-x-2 hover:shadow-lg transition-shadow"
+      className="px-6 py-2.5 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-full font-semibold text-base flex items-center space-x-2 hover:shadow-lg transition-shadow"
     >
       <span>Connect Wallet</span>
     </motion.button>

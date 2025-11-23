@@ -84,13 +84,13 @@ const DiamondCard = ({
     whileHover={{ scale: 1.04 }}
     className={`absolute h-48 w-48 md:h-56 md:w-56 ${positionClass}`}
   >
-    <div className="absolute inset-0 rotate-45 rounded-[32px] bg-white shadow-2xl shadow-slate-900/40 border border-slate-200 flex items-center justify-center">
+    <div className="absolute inset-0 rotate-45 rounded-4xl bg-white shadow-2xl shadow-slate-900/40 border border-slate-200 flex items-center justify-center">
       <div className="-rotate-45 px-6 text-center">
         <h3 className="text-lg font-semibold text-slate-900 mb-2">{feature.title}</h3>
         <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
       </div>
     </div>
-    <div className="absolute inset-0 rotate-45 rounded-[32px] bg-blue-200/20" />
+    <div className="absolute inset-0 rotate-45 rounded-4xl bg-blue-200/20" />
   </motion.div>
 );
 
@@ -185,7 +185,7 @@ const successMetrics = [
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 text-slate-900 overflow-hidden">
+    <div className="relative min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-100 text-slate-900 overflow-hidden">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 left-10 h-96 w-96 rounded-full bg-blue-200/40 blur-3xl" />
         <div className="absolute top-1/3 -right-24 h-80 w-80 rounded-full bg-indigo-200/40 blur-3xl" />
@@ -206,7 +206,7 @@ export default function LandingPage() {
             >
               <source src="https://res.cloudinary.com/dxswouxj5/video/upload/v1761270457/6913299_Motion_Graphics_Motion_Graphic_1080x1920_u1bpqe.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/40" />
+            <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/10 to-black/40" />
             <motion.div
               className="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-white/25 blur-3xl"
               animate={{ x: ['-50%', '40%', '-30%', '-50%'], opacity: [0.3, 0.6, 0.3, 0.4] }}
@@ -271,7 +271,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative rounded-[32px] bg-white shadow-xl shadow-blue-100/60 border border-white/70 px-8 py-10"
+                className="relative rounded-4xl bg-white shadow-xl shadow-blue-100/60 border border-white/70 px-8 py-10"
               >
                 <div className="absolute -top-5 left-8 flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white font-semibold shadow-lg">
                   {index + 1}
@@ -313,7 +313,7 @@ export default function LandingPage() {
                     whileHover={{ scale: 1.06 }}
                     animate={{ y: [0, -10, 0] }}
                     transition={{ duration: 6 + index, repeat: Infinity, ease: 'easeInOut' }}
-                    className={`mx-auto flex h-64 w-64 flex-col items-center justify-center rounded-full bg-gradient-to-br ${role.gradient} text-white shadow-2xl`}
+                    className={`mx-auto flex h-64 w-64 flex-col items-center justify-center rounded-full bg-linear-to-br ${role.gradient} text-white shadow-2xl`}
                   >
                     <div className="mb-4 rounded-full bg-white/20 p-4">
                       {role.icon}
@@ -350,7 +350,7 @@ export default function LandingPage() {
               Roadmap to the universal payment layer
             </motion.h2>
             <div className="mt-16 relative">
-              <div className="absolute left-1/2 top-0 bottom-0 hidden w-1 -translate-x-1/2 rounded-full bg-gradient-to-b from-blue-300 via-blue-100 to-transparent md:block" />
+              <div className="absolute left-1/2 top-0 bottom-0 hidden w-1 -translate-x-1/2 rounded-full bg-linear-to-b from-blue-300 via-blue-100 to-transparent md:block" />
               <div className="space-y-12">
                 {roadmapPhases.map((phase, index) => (
                   <motion.div
