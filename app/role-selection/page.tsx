@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { useWalletConnection } from '../../hooks/useWalletConnection';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
@@ -11,6 +12,7 @@ import Link from 'next/link';
 export default function RoleSelection() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const router = useRouter();
+  const { isConnected } = useWalletConnection();
 
   const roles = [
     {
@@ -64,6 +66,7 @@ export default function RoleSelection() {
   ];
 
   const handleRoleSelect = (roleId: string) => {
+    if (!isConnected) return;
     setSelectedRole(roleId);
   };
 
@@ -101,6 +104,13 @@ export default function RoleSelection() {
         </div>
       </section>
 
+      {/* Wallet connection required message */}
+      {!isConnected && (
+        <div className="max-w-2xl mx-auto mb-8 p-4 bg-yellow-100 text-yellow-900 rounded-lg text-center border border-yellow-300">
+          <span className="font-semibold">Please connect your wallet to continue. Role selection is disabled until your wallet is connected.</span>
+        </div>
+      )}
+
       {/* Role Cards */}
       <section className="pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -111,13 +121,16 @@ export default function RoleSelection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.2 }}
-                whileHover={{ scale: 1.02, y: -5 }}
-                className={`relative overflow-hidden rounded-3xl p-8 cursor-pointer transition-all duration-300 ${
+                whileHover={isConnected ? { scale: 1.02, y: -5 } : {}}
+                className={`relative overflow-hidden rounded-3xl p-8 transition-all duration-300 ${
+                  isConnected ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'} ${
                   selectedRole === role.id 
                     ? 'ring-4 ring-blue-500 shadow-2xl' 
                     : 'shadow-lg hover:shadow-xl'
                 } ${role.bgColor} border border-slate-200`}
                 onClick={() => handleRoleSelect(role.id)}
+                tabIndex={isConnected ? 0 : -1}
+                aria-disabled={!isConnected}
               >
                 {/* Background Gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${role.color} opacity-5`} />

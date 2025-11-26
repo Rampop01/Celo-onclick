@@ -1,5 +1,5 @@
 import { cookieStorage, createStorage } from 'wagmi'
-import { mainnet, sepolia, celo } from 'wagmi/chains'
+import { celo } from 'wagmi/chains'
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { celoSepolia } from './contract'
@@ -18,12 +18,10 @@ const metadata = {
   icons: ['https://onclick.app/favicon.ico']
 }
 
-// Define the chains - Include both testnet and mainnet
+// Define the chains - Focus on Celo testnet for now
 const chains = [
-  mainnet,
-  sepolia,
-  celo,
-  celoSepolia, // Added Celo Sepolia testnet
+  celoSepolia, // Celo Sepolia testnet (primary)
+  celo, // Celo mainnet (for production later)
 ] as const
 
 // Create wagmi adapter with chains and projectId
@@ -33,7 +31,7 @@ const wagmiAdapter = new WagmiAdapter({
   }),
   ssr: true,
   projectId,
-  networks: chains
+  networks: chains,
 })
 
 // Create the AppKit instance

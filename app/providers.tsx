@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 import { wagmiConfig } from '../lib/wagmi';
+import { Toaster } from 'react-hot-toast';
 
 interface ThemeContextType {
   isDark: boolean;
@@ -55,16 +56,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
     setIsDark(!isDark);
   };
 
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return null;
-  }
-
+  // Always wrap with providers, but prevent theme hydration mismatch
+  // by not applying theme class until mounted (handled in useEffect)
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <ThemeContext.Provider value={{ isDark, toggleTheme }}>
           {children}
+          <Toaster position="top-right" />
         </ThemeContext.Provider>
       </QueryClientProvider>
     </WagmiProvider>

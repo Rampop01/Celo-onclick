@@ -1,5 +1,7 @@
 'use client';
 
+import { toast } from 'react-hot-toast';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -231,7 +233,7 @@ function CreatePageContent() {
     if (file) {
       // Check if it's an image
       if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
+        toast('Please select an image file', { icon: '⚠️' });
         return;
       }
       

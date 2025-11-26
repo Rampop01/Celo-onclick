@@ -9,9 +9,10 @@ import onClickAbi from './onclick-abi.json';
 
 /**
  * Celo Sepolia Testnet Chain Definition
+ * Chain ID: 11142220 (0xA981EC)
  */
 export const celoSepolia = defineChain({
-  id: 84532, // Celo Sepolia chain ID
+  id: 11142220, // Correct Celo Sepolia chain ID (not 84532 which is Base Sepolia)
   name: 'Celo Sepolia Testnet',
   network: 'celo-sepolia',
   nativeCurrency: {
@@ -161,7 +162,7 @@ export const NETWORK_INFO = {
     explorer: 'https://sepolia.celoscan.io',
     faucet: 'https://faucet.celo.org/sepolia',
     rpcUrl: 'https://rpc.ankr.com/celo_sepolia',
-    chainId: 84532,
+    chainId: 11142220, // Correct Celo Sepolia chain ID
   },
   mainnet: {
     name: 'Celo Mainnet',

@@ -4,9 +4,10 @@
 
 'use client';
 
-import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
-import { ONCLICK_CONTRACT, Role, toUSDCAmount, fromUSDCAmount, Page, Payment, USDC_ADDRESS } from '../lib/contract';
+import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt, useSwitchChain, useChainId } from 'wagmi';
+import { ONCLICK_CONTRACT, Role, toUSDCAmount, fromUSDCAmount, Page, Payment, USDC_ADDRESS, CHAIN } from '../lib/contract';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 /**
  * Hook to create a new page
@@ -14,6 +15,9 @@ import { useEffect, useState } from 'react';
 export function useCreatePage() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { switchChain } = useSwitchChain();
+  const chainId = useChainId();
+  const { isConnected } = useAccount();
 
   const createPage = async (
     handle: string,
@@ -22,6 +26,19 @@ export function useCreatePage() {
     goal: number = 0,
     deadline: number = 0
   ) => {
+    // Check if wallet is connected and on the correct chain
+    if (isConnected && chainId !== CHAIN.id) {
+      toast.error(`Please switch to ${CHAIN.name} to continue`);
+      try {
+        await switchChain({ chainId: CHAIN.id });
+        // Wait a bit for chain switch
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (switchError: any) {
+        toast.error(`Failed to switch chain: ${switchError.message}`);
+        return;
+      }
+    }
+
     const goalAmount = goal > 0 ? toUSDCAmount(goal) : BigInt(0);
     const deadlineTimestamp = deadline > 0 ? BigInt(Math.floor(deadline / 1000)) : BigInt(0);
 
@@ -29,6 +46,7 @@ export function useCreatePage() {
       ...ONCLICK_CONTRACT,
       functionName: 'createPage',
       args: [handle, role, walletAddress, goalAmount, deadlineTimestamp],
+      chainId: CHAIN.id,
     });
   };
 
@@ -48,14 +66,31 @@ export function useCreatePage() {
 export function useMakePayment() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { switchChain } = useSwitchChain();
+  const chainId = useChainId();
+  const { isConnected } = useAccount();
 
   const makePayment = async (handle: string, amount: number, message: string = '') => {
+    // Check if wallet is connected and on the correct chain
+    if (isConnected && chainId !== CHAIN.id) {
+      toast.error(`Please switch to ${CHAIN.name} to continue`);
+      try {
+        await switchChain({ chainId: CHAIN.id });
+        // Wait a bit for chain switch
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (switchError: any) {
+        toast.error(`Failed to switch chain: ${switchError.message}`);
+        return;
+      }
+    }
+
     const amountInUSDC = toUSDCAmount(amount);
 
     writeContract({
       ...ONCLICK_CONTRACT,
       functionName: 'makePayment',
       args: [handle, amountInUSDC, message],
+      chainId: CHAIN.id,
     });
   };
 
@@ -75,8 +110,24 @@ export function useMakePayment() {
 export function useApproveUSDC() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { switchChain } = useSwitchChain();
+  const chainId = useChainId();
+  const { isConnected } = useAccount();
 
   const approveUSDC = async (amount: bigint) => {
+    // Check if wallet is connected and on the correct chain
+    if (isConnected && chainId !== CHAIN.id) {
+      toast.error(`Please switch to ${CHAIN.name} to continue`);
+      try {
+        await switchChain({ chainId: CHAIN.id });
+        // Wait a bit for chain switch
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (switchError: any) {
+        toast.error(`Failed to switch chain: ${switchError.message}`);
+        return;
+      }
+    }
+
     writeContract({
       address: USDC_ADDRESS,
       abi: [
@@ -93,6 +144,7 @@ export function useApproveUSDC() {
       ],
       functionName: 'approve',
       args: [ONCLICK_CONTRACT.address, amount],
+      chainId: CHAIN.id,
     });
   };
 
@@ -128,6 +180,10 @@ export function useUSDCAllowance() {
     ],
     functionName: 'allowance',
     args: address ? [address, ONCLICK_CONTRACT.address] : undefined,
+    chainId: CHAIN.id, // Specify chain for contract calls
+    query: {
+      enabled: !!address,
+    },
   });
 
   return {
@@ -156,6 +212,10 @@ export function useUSDCBalance() {
     ],
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
+    chainId: CHAIN.id, // Specify chain for contract calls
+    query: {
+      enabled: !!address,
+    },
   });
 
   return {
@@ -174,6 +234,7 @@ export function useGetPage(handle: string | undefined) {
     ...ONCLICK_CONTRACT,
     functionName: 'getPage',
     args: handle ? [handle] : undefined,
+    chainId: CHAIN.id,
     query: {
       enabled: !!handle,
     },
@@ -195,6 +256,7 @@ export function useIsHandleAvailable(handle: string | undefined) {
     ...ONCLICK_CONTRACT,
     functionName: 'isHandleAvailable',
     args: handle ? [handle] : undefined,
+    chainId: CHAIN.id,
     query: {
       enabled: !!handle && handle.length > 0,
     },
@@ -214,6 +276,7 @@ export function useGetPayments(handle: string | undefined) {
     ...ONCLICK_CONTRACT,
     functionName: 'getPayments',
     args: handle ? [handle] : undefined,
+    chainId: CHAIN.id,
     query: {
       enabled: !!handle,
     },
@@ -232,6 +295,9 @@ export function useGetPayments(handle: string | undefined) {
 export function useUpdatePage() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { switchChain } = useSwitchChain();
+  const chainId = useChainId();
+  const { isConnected } = useAccount();
 
   const updatePage = async (
     handle: string,
@@ -239,6 +305,19 @@ export function useUpdatePage() {
     goal: number = 0,
     deadline: number = 0
   ) => {
+    // Check if wallet is connected and on the correct chain
+    if (isConnected && chainId !== CHAIN.id) {
+      toast.error(`Please switch to ${CHAIN.name} to continue`);
+      try {
+        await switchChain({ chainId: CHAIN.id });
+        // Wait a bit for chain switch
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (switchError: any) {
+        toast.error(`Failed to switch chain: ${switchError.message}`);
+        return;
+      }
+    }
+
     const goalAmount = goal > 0 ? toUSDCAmount(goal) : BigInt(0);
     const deadlineTimestamp = deadline > 0 ? BigInt(Math.floor(deadline / 1000)) : BigInt(0);
 
@@ -246,6 +325,7 @@ export function useUpdatePage() {
       ...ONCLICK_CONTRACT,
       functionName: 'updatePage',
       args: [handle, walletAddress, goalAmount, deadlineTimestamp],
+      chainId: CHAIN.id,
     });
   };
 
@@ -267,6 +347,7 @@ export function useIsGoalReached(handle: string | undefined) {
     ...ONCLICK_CONTRACT,
     functionName: 'isGoalReached',
     args: handle ? [handle] : undefined,
+    chainId: CHAIN.id,
     query: {
       enabled: !!handle,
     },
