@@ -51,23 +51,23 @@ export function RampWidget({ amount, onClose, onSuccess }: RampWidgetProps) {
       // Theme
       variant: 'auto', // 'auto', 'mobile', or 'desktop'
       
-      // Callbacks
-      onPurchaseCreated: (purchase) => {
+      // Callbacks - using type assertion as SDK types may be outdated
+      onPurchaseCreated: (purchase: any) => {
         console.log('Purchase created:', purchase);
       },
-      onPurchaseSuccess: (purchase) => {
+      onPurchaseSuccess: (purchase: any) => {
         console.log('Purchase successful!', purchase);
         onSuccess?.();
         onClose?.();
       },
-      onPurchaseFailed: (error) => {
+      onPurchaseFailed: (error: any) => {
         console.error('Purchase failed:', error);
       },
       onWidgetClose: () => {
         console.log('Widget closed');
         onClose?.();
       },
-    });
+    } as any);
 
     ramp.show();
   };

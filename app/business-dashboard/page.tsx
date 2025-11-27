@@ -19,6 +19,9 @@ import {
 } from 'lucide-react';
 import { dummyData } from '../../data/dummyData';
 
+// Force dynamic rendering to avoid SSR issues with Web3 hooks
+export const dynamic = 'force-dynamic';
+
 export default function BusinessDashboard() {
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isCreatingProduct, setIsCreatingProduct] = useState(false);

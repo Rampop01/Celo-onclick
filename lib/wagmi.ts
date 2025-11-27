@@ -3,6 +3,7 @@ import { celo } from 'wagmi/chains'
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { celoSepolia } from './contract'
+import type { AppKitNetwork } from '@reown/appkit/networks'
 
 // Get your projectId from https://cloud.reown.com
 export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || 'fe72915b3fa7b7e81b11cc99a79a433e'
@@ -22,7 +23,7 @@ const metadata = {
 const chains = [
   celoSepolia, // Celo Sepolia testnet (primary)
   celo, // Celo mainnet (for production later)
-] as const
+]
 
 // Create wagmi adapter with chains and projectId
 const wagmiAdapter = new WagmiAdapter({
@@ -31,7 +32,7 @@ const wagmiAdapter = new WagmiAdapter({
   }),
   ssr: true,
   projectId,
-  networks: chains,
+  networks: chains as any,
 })
 
 // Create the AppKit instance
@@ -39,7 +40,7 @@ export const appKit = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
   metadata,
-  networks: chains,
+  networks: chains as any,
   features: {
     analytics: true,
   },

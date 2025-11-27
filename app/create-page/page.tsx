@@ -171,9 +171,9 @@ function CreatePageContent() {
       color: 'from-blue-400 to-blue-600',
       themes: ['#8CCDEB', '#A78BFA', '#F472B6', '#34D399', '#60A5FA', '#FB7185'],
       layouts: [
-        { id: 'minimal', name: 'Minimal', description: 'Clean and simple', icon: '✨' },
-        { id: 'creative', name: 'Creative', description: 'Bold and artistic', icon: '🎨' },
-        { id: 'community', name: 'Community', description: 'Engaging and social', icon: '👥' }
+        { id: 'minimal', name: 'Minimal', description: 'Simple donation page', icon: '✨' },
+        { id: 'creative', name: 'Creative', description: 'Full-screen artistic hero', icon: '🎨' },
+        { id: 'community', name: 'Community', description: 'Card-based supporter view', icon: '👥' }
       ]
     },
     business: {
@@ -182,9 +182,9 @@ function CreatePageContent() {
       color: 'from-blue-500 to-cyan-500',
       themes: ['#4A9BC7', '#0EA5E9', '#0891B2', '#0369A1', '#075985', '#0C4A6E'],
       layouts: [
-        { id: 'minimal', name: 'Professional', description: 'Clean and corporate', icon: '💼' },
-        { id: 'store', name: 'Store', description: 'Product-focused', icon: '🏪' },
-        { id: 'service', name: 'Service', description: 'Service-oriented', icon: '🔧' }
+        { id: 'minimal', name: 'Professional', description: 'Corporate payment page', icon: '💼' },
+        { id: 'store', name: 'Store', description: 'E-commerce storefront', icon: '🏪' },
+        { id: 'service', name: 'Service', description: 'Service-oriented layout', icon: '🔧' }
       ]
     },
     crowdfunder: {
@@ -193,9 +193,9 @@ function CreatePageContent() {
       color: 'from-blue-600 to-blue-800',
       themes: ['#2E86AB', '#0F4C75', '#062E47', '#E63946', '#F77F00', '#FCBF49'],
       layouts: [
-        { id: 'campaign', name: 'Campaign', description: 'Goal-focused with progress', icon: '🎯' },
-        { id: 'milestone', name: 'Milestone', description: 'Milestone-driven', icon: '🏆' },
-        { id: 'story', name: 'Story', description: 'Narrative-focused', icon: '📖' }
+        { id: 'campaign', name: 'Campaign', description: 'Progress bar & goal tracking', icon: '🎯' },
+        { id: 'milestone', name: 'Milestone', description: 'Hero layout with milestones', icon: '🏆' },
+        { id: 'story', name: 'Story', description: 'Card layout, story-driven', icon: '📖' }
       ]
     }
   };
@@ -555,41 +555,37 @@ function CreatePageContent() {
                     </div>
 
                     {/* Role-specific fields */}
-                    {(formData.role === 'crowdfunder' || formData.role === 'creator') && (
+                    {formData.role === 'crowdfunder' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-semibold text-slate-700 mb-2">
-                            {formData.role === 'crowdfunder' ? 'Funding Goal ($)' : 'Support Goal ($)'}
-                            <span className="text-xs text-slate-500 ml-2 font-normal">
-                              {formData.role === 'creator' ? '(Optional - for transparency)' : ''}
-                            </span>
+                            Funding Goal ($)
+                            <span className="text-xs text-red-500 ml-2 font-normal">*Required</span>
                           </label>
                           <input
                             type="number"
                             value={formData.goal}
                             onChange={(e) => handleInputChange('goal', e.target.value)}
                             className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder={formData.role === 'crowdfunder' ? '5000' : '10000'}
+                            placeholder="5000"
+                            required
                           />
-                          {formData.role === 'creator' && (
-                            <p className="text-xs text-slate-500 mt-1">
-                              Set a goal to track progress and show transparency to your supporters
-                            </p>
-                          )}
+                          <p className="text-xs text-slate-500 mt-1">
+                            Set your campaign's funding target
+                          </p>
                         </div>
-                        {formData.role === 'crowdfunder' && (
-                          <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
-                              Campaign Deadline
-                            </label>
-                            <input
-                              type="date"
-                              value={formData.deadline}
-                              onChange={(e) => handleInputChange('deadline', e.target.value)}
-                              className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                          </div>
-                        )}
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            Campaign Deadline
+                            <span className="text-xs text-slate-500 ml-2 font-normal">(Optional)</span>
+                          </label>
+                          <input
+                            type="date"
+                            value={formData.deadline}
+                            onChange={(e) => handleInputChange('deadline', e.target.value)}
+                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -624,8 +620,14 @@ function CreatePageContent() {
                     <div className="w-16 h-16 primary-gradient rounded-2xl flex items-center justify-center mx-auto mb-4">
                       <Palette className="w-8 h-8 text-white" />
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-900 mb-2">Customize your page</h2>
-                    <p className="text-slate-600">Make it uniquely yours</p>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-2">Customize your {formData.role === 'crowdfunder' ? 'campaign' : formData.role === 'business' ? 'business page' : 'page'}</h2>
+                    <p className="text-slate-600">
+                      {formData.role === 'crowdfunder' 
+                        ? 'Choose a layout that best showcases your campaign' 
+                        : formData.role === 'business'
+                        ? 'Select a professional layout for your business'
+                        : 'Pick a style that reflects your creative identity'}
+                    </p>
                   </div>
 
                   <div className="space-y-8">
