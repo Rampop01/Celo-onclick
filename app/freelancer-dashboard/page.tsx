@@ -23,10 +23,10 @@ import { dummyData } from '../../data/dummyData';
 // Force dynamic rendering to avoid SSR issues with Web3 hooks
 export const dynamic = 'force-dynamic';
 
-export default function CreatorDashboard() {
+export default function FreelancerDashboard() {
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [creatorData, setCreatorData] = useState(dummyData.creator);
+  const [freelancerData, setFreelancerData] = useState(dummyData.creator);
 
   const handleEdit = () => {
     setIsEditing(!isEditing);
@@ -44,10 +44,10 @@ export default function CreatorDashboard() {
   const handleSave = () => {
     setIsEditing(false);
     // In a real app, this would save the data
-    console.log('Saving creator data:', creatorData);
+    console.log('Saving creator data:', freelancerData);
   };
 
-  const progressPercentage = (creatorData.raised / creatorData.goal) * 100;
+  const progressPercentage = (freelancerData.raised / freelancerData.goal) * 100;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
@@ -65,10 +65,10 @@ export default function CreatorDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                  Creator Dashboard
+                  Freelancer Dashboard
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Manage your creator page and track your supporters
+                  Manage your freelancer page and track your clients
                 </p>
               </div>
               <div className="flex space-x-3">
@@ -122,7 +122,7 @@ export default function CreatorDashboard() {
                     <div>
                       <p className="text-gray-600 dark:text-gray-400 text-sm">Total Supporters</p>
                       <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                        {creatorData.supporters}
+                        {freelancerData.supporters}
                       </p>
                     </div>
                     <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
@@ -136,7 +136,7 @@ export default function CreatorDashboard() {
                     <div>
                       <p className="text-gray-600 dark:text-gray-400 text-sm">Total Received</p>
                       <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                        ${creatorData.raised.toLocaleString()}
+                        ${freelancerData.raised.toLocaleString()}
                       </p>
                     </div>
                     <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
@@ -172,7 +172,7 @@ export default function CreatorDashboard() {
                     Funding Goal
                   </h3>
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    ${creatorData.raised.toLocaleString()} of ${creatorData.goal.toLocaleString()}
+                    ${freelancerData.raised.toLocaleString()} of ${freelancerData.goal.toLocaleString()}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
@@ -196,7 +196,7 @@ export default function CreatorDashboard() {
                   Recent Payments
                 </h3>
                 <div className="space-y-4">
-                  {creatorData.recentPayments.map((payment, index) => (
+                  {freelancerData.recentPayments.map((payment, index) => (
                     <motion.div
                       key={payment.id}
                       initial={{ opacity: 0, x: -20 }}
@@ -251,7 +251,7 @@ export default function CreatorDashboard() {
                     </label>
                     <div className="relative">
                       <img
-                        src={creatorData.banner}
+                        src={freelancerData.banner}
                         alt="Banner"
                         className="w-full h-32 object-cover rounded-lg"
                       />
@@ -275,10 +275,10 @@ export default function CreatorDashboard() {
                         <button
                           key={color}
                           className={`w-8 h-8 rounded-full border-2 ${
-                            creatorData.theme === color ? 'border-gray-900 dark:border-white' : 'border-gray-300'
+                            freelancerData.theme === color ? 'border-gray-900 dark:border-white' : 'border-gray-300'
                           }`}
                           style={{ backgroundColor: color }}
-                          onClick={() => setCreatorData({ ...creatorData, theme: color })}
+                          onClick={() => setCreatorData({ ...freelancerData, theme: color })}
                         />
                       ))}
                     </div>
@@ -290,8 +290,8 @@ export default function CreatorDashboard() {
                       Description
                     </label>
                     <textarea
-                      value={creatorData.description}
-                      onChange={(e) => setCreatorData({ ...creatorData, description: e.target.value })}
+                      value={freelancerData.description}
+                      onChange={(e) => setCreatorData({ ...freelancerData, description: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       rows={4}
                     />
@@ -304,8 +304,8 @@ export default function CreatorDashboard() {
                     </label>
                     <input
                       type="number"
-                      value={creatorData.goal}
-                      onChange={(e) => setCreatorData({ ...creatorData, goal: parseInt(e.target.value) })}
+                      value={freelancerData.goal}
+                      onChange={(e) => setCreatorData({ ...freelancerData, goal: parseInt(e.target.value) })}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
@@ -335,8 +335,8 @@ export default function CreatorDashboard() {
       <QRShareModal
         isOpen={isQRModalOpen}
         onClose={() => setIsQRModalOpen(false)}
-        url={`https://onclick.app/creator/${creatorData.name.toLowerCase().replace(/\s+/g, '-')}`}
-        title={creatorData.name}
+        url={`https://onclick.app/creator/${freelancerData.name.toLowerCase().replace(/\s+/g, '-')}`}
+        title={freelancerData.name}
       />
     </div>
   );

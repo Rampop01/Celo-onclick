@@ -16,32 +16,30 @@ export default function RoleSelection() {
 
   const roles = [
     {
-      id: 'creator',
-      title: 'Creator',
-      subtitle: 'Digital Artist & Content Creator',
-      description: 'Create your personalized support page. Accept donations, tips, and build your community with instant crypto payments.',
+      id: 'freelancer',
+      title: 'Freelancer',
+      subtitle: 'Services & Professionals',
+      description: 'Get paid for your services',
       icon: <Users className="w-12 h-12" />,
       features: [
-        'Personalized payment page',
-        'Accept donations & tips',
-        'Share via QR code & link',
-        'Instant crypto settlements'
+        'Accept client payments',
+        'Share via QR & link',
+        'Instant settlements'
       ],
       color: 'from-blue-400 to-blue-600',
       bgColor: 'bg-blue-50',
-      href: '/create-page?role=creator'
+      href: '/create-page?role=freelancer'
     },
     {
       id: 'business',
       title: 'Business',
-      subtitle: 'E-commerce & Services',
-      description: 'Create your business payment page. Accept payments from customers worldwide with fiat or crypto.',
+      subtitle: 'Products & Services',
+      description: 'Accept payments globally',
       icon: <Building2 className="w-12 h-12" />,
       features: [
-        'Business payment page',
         'Fiat & crypto payments',
-        'Global customer reach',
-        'Direct wallet settlements'
+        'Worldwide customers',
+        'Direct to wallet'
       ],
       color: 'from-blue-500 to-blue-700',
       bgColor: 'bg-blue-50',
@@ -50,14 +48,13 @@ export default function RoleSelection() {
     {
       id: 'crowdfunder',
       title: 'Crowdfunder',
-      subtitle: 'Campaign & Fundraising',
-      description: 'Create your crowdfunding page. Launch campaigns, track progress, and receive transparent donations.',
+      subtitle: 'Campaigns & Fundraising',
+      description: 'Launch transparent campaigns',
       icon: <Target className="w-12 h-12" />,
       features: [
-        'Crowdfunding page',
-        'Goal tracking & progress',
-        'Supporter messages',
-        'Transparent donations'
+        'Track goals & progress',
+        'Supporter engagement',
+        'Transparent funding'
       ],
       color: 'from-blue-600 to-blue-800',
       bgColor: 'bg-blue-50',
@@ -93,12 +90,12 @@ export default function RoleSelection() {
             <div className="flex items-center justify-center mb-6">
               <Sparkles className="w-8 h-8 text-blue-500 mr-3" />
               <h1 className="text-4xl md:text-6xl font-bold text-slate-900">
-                Choose Your Path
+                Choose Your Role
               </h1>
               <Sparkles className="w-8 h-8 text-blue-500 ml-3" />
             </div>
-            <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Choose your role to create your personalized OnClick page. Each path is designed for your specific needs.
+            <p className="text-xl md:text-2xl text-slate-600 max-w-2xl mx-auto">
+              Create your personalized payment page in minutes
             </p>
           </motion.div>
         </div>
@@ -107,7 +104,7 @@ export default function RoleSelection() {
       {/* Wallet connection required message */}
       {!isConnected && (
         <div className="max-w-2xl mx-auto mb-8 p-4 bg-yellow-100 text-yellow-900 rounded-lg text-center border border-yellow-300">
-          <span className="font-semibold">Please connect your wallet to continue. Role selection is disabled until your wallet is connected.</span>
+          <span className="font-semibold">Connect your wallet to continue</span>
         </div>
       )}
 
@@ -136,40 +133,37 @@ export default function RoleSelection() {
                 <div className={`absolute inset-0 bg-gradient-to-br ${role.color} opacity-5`} />
                 
                 {/* Content */}
-                <div className="relative z-10">
-                  {/* Icon */}
-                  <div className={`w-20 h-20 bg-gradient-to-br ${role.color} rounded-2xl flex items-center justify-center text-white mb-6`}>
-                    {role.icon}
+                <div className="relative z-10 flex flex-col h-full">
+                  {/* Title & Subtitle */}
+                  <div className="mb-4">
+                    <h3 className="text-3xl font-bold text-slate-900 mb-1">
+                      {role.title}
+                    </h3>
+                    <p className="text-sm text-slate-500 font-medium">
+                      {role.subtitle}
+                    </p>
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                    {role.title}
-                  </h3>
-                  <p className="text-slate-600 mb-4">
-                    {role.subtitle}
-                  </p>
-
                   {/* Description */}
-                  <p className="text-slate-700 mb-6 leading-relaxed">
+                  <p className="text-lg text-slate-700 mb-6 font-medium">
                     {role.description}
                   </p>
 
                   {/* Features */}
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-2.5 mb-8 flex-grow">
                     {role.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center text-slate-600">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
-                        {feature}
+                      <li key={featureIndex} className="flex items-center text-slate-600 text-sm">
+                        <Check className="w-4 h-4 text-blue-500 mr-2.5 flex-shrink-0" />
+                        <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
 
                   {/* Selection Status */}
-                  <div className={`w-full py-4 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all ${
+                  <div className={`w-full py-3.5 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all ${
                     selectedRole === role.id
-                      ? `bg-gradient-to-r ${role.color} text-white`
-                      : 'bg-slate-100 text-slate-600'
+                      ? `bg-gradient-to-r ${role.color} text-white shadow-lg`
+                      : 'bg-white/80 text-slate-600 border border-slate-200'
                   }`}>
                     {selectedRole === role.id ? (
                       <>
@@ -177,7 +171,7 @@ export default function RoleSelection() {
                         <span>Selected</span>
                       </>
                     ) : (
-                      <span>Select This Role</span>
+                      <span>Select</span>
                     )}
                   </div>
                 </div>
@@ -231,11 +225,11 @@ export default function RoleSelection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-              Not Sure Which Path to Choose?
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Not Sure Yet?
             </h2>
             <p className="text-lg text-slate-600 mb-8">
-              You can always switch between roles or use multiple features. Start with what feels right and explore from there.
+              You can always switch roles later. Start with what feels right.
             </p>
             <Link href="/">
               <motion.button

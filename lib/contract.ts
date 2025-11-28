@@ -77,9 +77,9 @@ export const ONCLICK_CONTRACT = {
  * Role Enum (matches smart contract)
  */
 export enum Role {
-  Creator = 0,
-  Business = 1,
-  Crowdfunder = 2,
+  Freelancer = 0, // Freelancers offering services
+  Business = 1,   // Businesses selling products
+  Crowdfunder = 2, // Fundraising campaigns
 }
 
 /**

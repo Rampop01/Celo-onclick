@@ -37,7 +37,7 @@ import Link from 'next/link';
 function CreatePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const roleFromUrl = (searchParams && searchParams.get('role')) || 'creator';
+  const roleFromUrl = (searchParams && searchParams.get('role')) || 'freelancer';
   const nameFromUrl = (searchParams && searchParams.get('name')) || '';
   const handleFromUrl = (searchParams && searchParams.get('handle')) || '';
   const stepFromUrl = (searchParams && searchParams.get('step')) || '';
@@ -141,7 +141,7 @@ function CreatePageContent() {
   // Update role and step if URL changes
   useEffect(() => {
     if (searchParams) {
-      const role = searchParams.get('role') || 'creator';
+      const role = searchParams.get('role') || 'freelancer';
       const step = searchParams.get('step');
       if (step) {
         const stepNum = parseInt(step, 10);
@@ -165,15 +165,15 @@ function CreatePageContent() {
   }, [searchParams]);
 
   const roleConfig = {
-    creator: {
-      title: 'Creator Page',
+    freelancer: {
+      title: 'Freelancer Page',
       icon: <Users className="w-6 h-6" />,
       color: 'from-blue-400 to-blue-600',
       themes: ['#8CCDEB', '#A78BFA', '#F472B6', '#34D399', '#60A5FA', '#FB7185'],
       layouts: [
-        { id: 'minimal', name: 'Minimal', description: 'Simple donation page', icon: '✨' },
-        { id: 'creative', name: 'Creative', description: 'Full-screen artistic hero', icon: '🎨' },
-        { id: 'community', name: 'Community', description: 'Card-based supporter view', icon: '👥' }
+        { id: 'minimal', name: 'Minimal', description: 'Simple payment page', icon: '✨' },
+        { id: 'creative', name: 'Creative', description: 'Full-screen professional hero', icon: '🎨' },
+        { id: 'community', name: 'Portfolio', description: 'Showcase your work', icon: '👥' }
       ]
     },
     business: {
@@ -297,7 +297,7 @@ function CreatePageContent() {
 
   function getDefaultTheme(role: string): string {
     const themes: Record<string, string> = {
-      creator: '#8CCDEB',
+      freelancer: '#8CCDEB',
       business: '#4A9BC7',
       crowdfunder: '#2E86AB'
     };
@@ -306,7 +306,7 @@ function CreatePageContent() {
 
   function getDefaultLayout(role: string): string {
     const layouts: Record<string, string> = {
-      creator: 'minimal',
+      freelancer: 'minimal',
       business: 'minimal',
       crowdfunder: 'campaign'
     };
@@ -348,7 +348,7 @@ function CreatePageContent() {
               Create Your OnClick Page
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Build your personalized {formData.role === 'crowdfunder' ? 'crowdfunding' : formData.role === 'business' ? 'business' : 'creator'} page in minutes. Share your link and start receiving support globally.
+              Build your personalized {formData.role === 'crowdfunder' ? 'crowdfunding' : formData.role === 'business' ? 'business' : 'freelancer'} page in minutes. Share your link and start receiving payments globally.
             </p>
           </motion.div>
 
@@ -550,7 +550,7 @@ function CreatePageContent() {
                         onChange={(e) => handleInputChange('description', e.target.value)}
                         rows={4}
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder={formData.role === 'crowdfunder' ? 'Tell the story of your campaign and what you\'re raising funds for...' : formData.role === 'business' ? 'Describe your business, products, or services...' : 'Tell people about yourself, your work, or your content...'}
+                        placeholder={formData.role === 'crowdfunder' ? 'Tell the story of your campaign and what you\'re raising funds for...' : formData.role === 'business' ? 'Describe your business, products, or services...' : 'Tell people about your services and expertise...'}
                       />
                     </div>
 
@@ -620,13 +620,13 @@ function CreatePageContent() {
                     <div className="w-16 h-16 primary-gradient rounded-2xl flex items-center justify-center mx-auto mb-4">
                       <Palette className="w-8 h-8 text-white" />
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-900 mb-2">Customize your {formData.role === 'crowdfunder' ? 'campaign' : formData.role === 'business' ? 'business page' : 'page'}</h2>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-2">Customize your {formData.role === 'crowdfunder' ? 'campaign' : formData.role === 'business' ? 'business page' : 'professional page'}</h2>
                     <p className="text-slate-600">
                       {formData.role === 'crowdfunder' 
                         ? 'Choose a layout that best showcases your campaign' 
                         : formData.role === 'business'
                         ? 'Select a professional layout for your business'
-                        : 'Pick a style that reflects your creative identity'}
+                        : 'Pick a style that reflects your professional identity'}
                     </p>
                   </div>
 
@@ -891,8 +891,8 @@ function CreatePageContent() {
                     // Convert role string to enum
                     let roleEnum: Role;
                     switch (formData.role) {
-                      case 'creator':
-                        roleEnum = Role.Creator;
+                      case 'freelancer':
+                        roleEnum = Role.Freelancer;
                         break;
                       case 'business':
                         roleEnum = Role.Business;
@@ -901,7 +901,7 @@ function CreatePageContent() {
                         roleEnum = Role.Crowdfunder;
                         break;
                       default:
-                        roleEnum = Role.Creator;
+                        roleEnum = Role.Freelancer;
                     }
 
                     // Convert goal and deadline

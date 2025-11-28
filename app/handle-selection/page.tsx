@@ -5,6 +5,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import { useIsHandleAvailable } from '../../hooks/useContract';
 import { 
   Sparkles, 
   ArrowRight, 
@@ -24,19 +25,22 @@ import Link from 'next/link';
 function HandleSelectionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const roleFromUrl = (searchParams && searchParams.get('role')) || 'creator';
+  const roleFromUrl = (searchParams && searchParams.get('role')) || 'freelancer';
   
   const [name, setName] = useState('');
   const [handle, setHandle] = useState('');
-  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
-  const [handleAvailability, setHandleAvailability] = useState<'available' | 'unavailable' | 'checking' | null>(null);
+  const [debouncedHandle, setDebouncedHandle] = useState('');
+  const [suggestedHandles, setSuggestedHandles] = useState<string[]>([]);
+  
+  // Use on-chain handle availability check
+  const { isAvailable, isLoading: isCheckingAvailability } = useIsHandleAvailable(debouncedHandle);
 
   const roleConfig = {
-    creator: {
-      title: 'Creator',
+    freelancer: {
+      title: 'Freelancer',
       icon: <Users className="w-6 h-6" />,
       color: 'from-blue-400 to-blue-600',
-      description: 'Your unique handle will be your personal brand on OnClick'
+      description: 'Your unique handle will be your professional brand on OnClick'
     },
     business: {
       title: 'Business',
@@ -52,62 +56,87 @@ function HandleSelectionContent() {
     }
   };
 
-  const currentRole = roleConfig[roleFromUrl as keyof typeof roleConfig] || roleConfig.creator;
+  const currentRole = roleConfig[roleFromUrl as keyof typeof roleConfig] || roleConfig.freelancer;
 
-  const generateHandle = () => {
+  const generateHandleSuggestions = async (baseHandle: string) => {
+    const suggestions: string[] = [];
+    const unavailableHandles = ['admin', 'test', 'demo', 'support', 'help', 'api', 'www', 'mail', 'contact', 'onclick', 'app'];
+    
+    // Generate multiple random numbers for variety
+    const randomNumbers = Array.from({ length: 3 }, () => Math.floor(Math.random() * 999) + 1);
+    
+    // Generate variations
+    const variations = [
+      `${baseHandle}${randomNumbers[0]}`,
+      `${baseHandle}-official`,
+      `${baseHandle}-${roleFromUrl}`,
+      `${baseHandle}${new Date().getFullYear()}`,
+      `${baseHandle}-hq`,
+      `the-${baseHandle}`,
+      `${baseHandle}${randomNumbers[1]}`,
+      `${baseHandle}-${randomNumbers[2]}`,
+    ];
+    
+    for (const variation of variations) {
+      // Check if variation is valid and available
+      if (!unavailableHandles.includes(variation.toLowerCase()) && 
+          variation.length >= 3 && 
+          variation.length <= 30) {
+        suggestions.push(variation);
+        if (suggestions.length >= 4) break;
+      }
+    }
+    
+    return suggestions;
+  };
+
+  const generateHandle = async () => {
     if (!name.trim()) {
       return;
     }
     const generatedHandle = name.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    
+    // Set the generated handle (will be checked on-chain via useEffect)
     setHandle(generatedHandle);
-    if (generatedHandle) {
-      checkHandleAvailability(generatedHandle);
+    
+    // If unavailable, generate suggestions
+    if (handleAvailability === 'unavailable') {
+      const suggestions = await generateHandleSuggestions(generatedHandle);
+      setSuggestedHandles(suggestions);
     }
   };
 
-  const checkHandleAvailability = async (handleToCheck: string) => {
-    if (!handleToCheck || handleToCheck.length < 3) {
-      setHandleAvailability(null);
-      return;
-    }
-
-    setIsCheckingAvailability(true);
-    setHandleAvailability('checking');
-
-    // Simulate API call - in production, this would check against your backend
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Mock availability check - simulate some handles being taken
-    const unavailableHandles = ['admin', 'test', 'demo', 'support', 'help', 'api', 'www', 'mail', 'contact', 'onclick', 'app'];
-    const isAvailable = !unavailableHandles.includes(handleToCheck.toLowerCase()) && handleToCheck.length >= 3;
-
-    setHandleAvailability(isAvailable ? 'available' : 'unavailable');
-    setIsCheckingAvailability(false);
-  };
-
-  // Check availability when handle changes
+  // Debounce handle input for on-chain check
   useEffect(() => {
-    if (handle) {
-      const timeoutId = setTimeout(() => {
-        checkHandleAvailability(handle);
-      }, 500); // Debounce for 500ms
+    const timeoutId = setTimeout(() => {
+      if (handle && handle.length >= 3) {
+        setDebouncedHandle(handle);
+      } else {
+        setDebouncedHandle('');
+        setSuggestedHandles([]);
+      }
+    }, 500);
 
-      return () => clearTimeout(timeoutId);
-    } else {
-      setHandleAvailability(null);
-    }
+    return () => clearTimeout(timeoutId);
   }, [handle]);
+  
+  // Determine availability status from on-chain data
+  const handleAvailability = !debouncedHandle || debouncedHandle.length < 3
+    ? null
+    : isCheckingAvailability
+    ? 'checking'
+    : isAvailable
+    ? 'available'
+    : 'unavailable';
+
+  const applySuggestedHandle = (suggestedHandle: string) => {
+    setHandle(suggestedHandle);
+    setSuggestedHandles([]); // Clear suggestions after applying
+  };
 
   const handleContinue = () => {
     if (name.trim() && handle.trim() && handleAvailability === 'available') {
-      // Save to localStorage for next page
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('onclick_page_data', JSON.stringify({
-          name: name.trim(),
-          handle: handle.trim(),
-          role: roleFromUrl
-        }));
-      }
+      // Pass data via URL params - will be saved on-chain in create-page
       router.push(`/create-page?role=${roleFromUrl}&name=${encodeURIComponent(name.trim())}&handle=${encodeURIComponent(handle.trim())}`);
     }
   };
@@ -265,13 +294,18 @@ function HandleSelectionContent() {
                   <button
                     onClick={generateHandle}
                     disabled={!name.trim()}
-                    className={`text-sm font-medium transition-colors ${
+                    className={`text-sm font-medium transition-colors flex items-center space-x-1 ${
                       name.trim()
                         ? 'text-blue-600 hover:text-blue-700'
                         : 'text-slate-400 cursor-not-allowed'
                     }`}
                   >
-                    ✨ Generate from {roleFromUrl === 'business' ? 'business name' : roleFromUrl === 'crowdfunder' ? 'campaign name' : 'name'}
+                    <Sparkles className="w-4 h-4" />
+                    <span>
+                      {handleAvailability === 'unavailable' 
+                        ? 'Generate alternatives' 
+                        : `Generate from ${roleFromUrl === 'business' ? 'business name' : roleFromUrl === 'crowdfunder' ? 'campaign name' : 'name'}`}
+                    </span>
                   </button>
                   {handle && (
                     <div className="flex items-center space-x-3">
@@ -296,14 +330,78 @@ function HandleSelectionContent() {
 
                 {/* Validation Messages */}
                 {handle && handle.length < 3 && (
-                  <p className="text-xs text-amber-600 mt-2">Handle must be at least 3 characters</p>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg"
+                  >
+                    <p className="text-xs text-amber-700 font-medium">Handle must be at least 3 characters</p>
+                  </motion.div>
                 )}
                 {handleAvailability === 'unavailable' && (
-                  <p className="text-xs text-red-600 mt-2">This handle is already taken. Please choose another one.</p>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-3 p-4 bg-red-50 border border-red-200 rounded-lg"
+                  >
+                    <div className="flex items-start">
+                      <X className="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-red-700 font-semibold mb-1">This handle is already taken</p>
+                        <p className="text-xs text-red-600">Click "Generate" below to see available alternatives</p>
+                      </div>
+                    </div>
+                  </motion.div>
                 )}
                 {handleAvailability === 'available' && (
-                  <p className="text-xs text-green-600 mt-2">Great choice! This handle is available.</p>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg"
+                  >
+                    <div className="flex items-center">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
+                      <p className="text-xs text-green-700 font-medium">Great choice! This handle is available.</p>
+                    </div>
+                  </motion.div>
                 )}
+
+                {/* Suggested Handles */}
+                <AnimatePresence>
+                  {suggestedHandles.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                    >
+                      <div className="flex items-start mb-3">
+                        <Sparkles className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm text-blue-900 font-semibold">Available Suggestions</p>
+                          <p className="text-xs text-blue-700">Click on any handle to use it</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {suggestedHandles.map((suggestion, index) => (
+                          <motion.button
+                            key={suggestion}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: index * 0.05 }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => applySuggestedHandle(suggestion)}
+                            className="px-3 py-2 bg-white border border-blue-300 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-colors text-left"
+                          >
+                            <span className="text-xs text-slate-500">onclick/</span>
+                            <span className="font-semibold">{suggestion}</span>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Continue Button */}

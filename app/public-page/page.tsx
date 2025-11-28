@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useAccount } from 'wagmi';
 import { useGetPage, useGetPayments, usePaymentFlow, useUSDCBalance } from '../../hooks/useContract';
 import { fromUSDCAmount } from '../../lib/contract';
 import Navbar from '../../components/Navbar';
@@ -36,20 +37,13 @@ import Link from 'next/link';
 export function PublicPageContent({ handle: handleFromPath }: { handle?: string } = {}) {
   const searchParams = useSearchParams();
   const handleFromUrl = handleFromPath || (searchParams && searchParams.get('handle')) || '';
-  type Role = 'creator' | 'business' | 'crowdfunder';
-  const roleFromUrl = ((searchParams && searchParams.get('role')) || 'creator') as Role;
+  type Role = 'freelancer' | 'business' | 'crowdfunder';
+  const roleFromUrl = ((searchParams && searchParams.get('role')) || 'freelancer') as Role;
   const layoutFromUrl = (searchParams && searchParams.get('layout')) || 'minimal';
   const ownerFromUrl = searchParams && searchParams.get('owner') === 'true';
   
   // Check if this is a preview (accessed via /public-page with owner=true) vs published (accessed via /handle)
   const isPreview = ownerFromUrl && !handleFromPath;
-  
-  // Check if user is the page owner
-  const isPageOwner = typeof window !== 'undefined' && (
-    ownerFromUrl || 
-    (handleFromUrl && sessionStorage.getItem(`onclick_page_owner_${handleFromUrl}`) === 'true') ||
-    sessionStorage.getItem('onclick_page_owner') === 'true'
-  );
   
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
@@ -62,11 +56,20 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [embedCodeCopied, setEmbedCodeCopied] = useState(false);
 
+  // Get connected wallet address
+  const { address: connectedAddress, isConnected } = useAccount();
+
   // On-chain data hooks
   const { page: onChainPage, isLoading: pageLoading, error: pageError, refetch: refetchPage } = useGetPage(handleFromUrl || undefined);
   const { payments: onChainPayments, isLoading: paymentsLoading, refetch: refetchPayments } = useGetPayments(handleFromUrl || undefined);
   const { balanceFormatted } = useUSDCBalance();
   const { startPayment, step: paymentStep, isSuccess: paymentIsSuccess, errorMessage: paymentErrorMessage, reset: resetPayment } = usePaymentFlow();
+  
+  // SECURE: Check if connected wallet is the actual on-chain page owner
+  const isPageOwner = isConnected && 
+                      connectedAddress && 
+                      onChainPage && 
+                      onChainPage.owner.toLowerCase() === connectedAddress.toLowerCase();
 
   // Auto-refetch when payment succeeds
   useEffect(() => {
@@ -203,7 +206,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
       ? `Check out ${pageData.name} on OnClick!`
       : roleFromUrl === 'crowdfunder'
       ? `Support ${pageData.name}'s campaign on OnClick!`
-      : `Support ${pageData.name} on OnClick!`;
+      : `Hire ${pageData.name} on OnClick!`; // Freelancer
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
     window.open(twitterUrl, '_blank');
   };
@@ -213,7 +216,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
       ? `Check out ${pageData.name} on OnClick!`
       : roleFromUrl === 'crowdfunder'
       ? `Support ${pageData.name}'s campaign on OnClick!`
-      : `Support ${pageData.name} on OnClick!`;
+      : `Hire ${pageData.name} on OnClick!`; // Freelancer
     const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
     window.open(telegramUrl, '_blank');
   };
@@ -303,18 +306,10 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
 
           {/* Centered Content */}
           <div className="relative z-10 text-center px-4 max-w-4xl mx-auto py-32">
-            <motion.img
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5 }}
-              src={pageData.avatar}
-              alt={pageData.name}
-              className="w-32 h-32 rounded-full border-8 border-white shadow-2xl mx-auto mb-8"
-            />
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.1 }}
               className="text-5xl md:text-7xl font-black text-white mb-6"
             >
               {pageData.name}
@@ -382,34 +377,19 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
               </div>
             )}
 
-            {/* Card Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {/* Avatar Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass-card rounded-2xl p-6 text-center shadow-xl"
-              >
-                <img
-                  src={pageData.avatar}
-                  alt={pageData.name}
-                  className="w-32 h-32 rounded-full border-4 border-white shadow-lg mx-auto mb-4"
-                />
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">{pageData.name}</h2>
-                <p className="text-slate-600">{pageData.title}</p>
-              </motion.div>
-
-              {/* Description Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="md:col-span-2 glass-card rounded-2xl p-8 shadow-xl"
-              >
+            {/* Info Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-card rounded-2xl p-8 shadow-xl mb-8"
+            >
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">{pageData.name}</h2>
+              <p className="text-lg text-slate-600 mb-6">{pageData.title}</p>
+              <div className="border-t border-slate-200 pt-6">
                 <h3 className="text-xl font-semibold text-slate-900 mb-4">About</h3>
                 <p className="text-slate-700 leading-relaxed">{pageData.description}</p>
-              </motion.div>
-            </div>
+              </div>
+            </motion.div>
           </div>
         </section>
       );
@@ -481,18 +461,12 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
             transition={{ duration: 0.8 }}
             className="glass-card rounded-2xl p-8 shadow-xl bg-white"
           >
-            <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-6">
-              <img
-                src={pageData.avatar}
-                alt={pageData.name}
-                className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
-              />
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">{pageData.name}</h1>
-                <p className="text-xl text-slate-600 mb-4">{pageData.title}</p>
-                <p className="text-slate-700 leading-relaxed">{pageData.description}</p>
+            <div>
+              <h1 className="text-4xl font-bold text-slate-900 mb-3">{pageData.name}</h1>
+              <p className="text-xl text-slate-600 mb-6">{pageData.title}</p>
+              <p className="text-slate-700 leading-relaxed text-lg">{pageData.description}</p>
                 {roleFromUrl === 'crowdfunder' && pageData.deadline && (
-                  <div className="flex items-center gap-2 mt-4 text-sm text-slate-600">
+                  <div className="flex items-center gap-2 mt-6 text-sm text-slate-600">
                     <Clock className="w-4 h-4" />
                     <span className="font-semibold">
                       {(() => {
@@ -504,7 +478,6 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                     </span>
                   </div>
                 )}
-              </div>
             </div>
           </motion.div>
         </div>
@@ -546,7 +519,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                     className="glass-card rounded-2xl p-8"
                   >
                     <h3 className="text-xl font-bold text-slate-900 mb-6">
-                      {isBusiness ? 'Make a Payment' : isCrowdfunder ? 'Support Campaign' : `Donate to ${pageData.name}`}
+                      {isBusiness ? 'Make a Payment' : isCrowdfunder ? 'Support Campaign' : `Pay ${pageData.name}`}
                     </h3>
 
                     <div className="space-y-6">
@@ -596,7 +569,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                           ? `Pay $${amount || '0'}`
                           : isCrowdfunder
                           ? `Support $${amount || '0'}`
-                          : `Donate $${amount || '0'}`}
+                          : `Pay $${amount || '0'}`}
                       </motion.button>
 
                       {/* Quick Amount Buttons */}
@@ -830,7 +803,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                   className="glass-card rounded-2xl p-8 sticky top-24"
                 >
                   <h3 className="text-xl font-bold text-slate-900 mb-6">
-                  {isBusiness ? 'Make a Payment' : isCrowdfunder ? 'Support Campaign' : `Donate to ${pageData.name}`}
+                  {isBusiness ? 'Make a Payment' : isCrowdfunder ? 'Support Campaign' : `Pay ${pageData.name}`}
                 </h3>
 
                 <div className="space-y-6">
@@ -880,7 +853,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                        ? `Pay $${amount || '0'}`
                        : isCrowdfunder
                        ? `Support $${amount || '0'}`
-                       : `Donate $${amount || '0'}`}
+                       : `Pay $${amount || '0'}`}
                    </motion.button>
 
                   {/* Quick Amount Buttons */}
@@ -999,25 +972,85 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                 </motion.div>
               </div>
             </div>
-          ) : (
-            // Centered layout for business and creator roles
-            <div className={`flex justify-center ${
-              (roleFromUrl === 'creator' && layoutFromUrl === 'creative') ||
-              (roleFromUrl === 'business' && layoutFromUrl === 'store') ||
-              (roleFromUrl === 'crowdfunder' && layoutFromUrl === 'milestone')
-                ? 'pt-16'
-                : ''
-            }`}>
-              <div className="w-full max-w-4xl">
+          ) : isBusiness && layoutFromUrl === 'store' ? (
+            // Business Store Layout with Products
+            <div className="pt-16">
+              <div className="max-w-7xl mx-auto">
+                {/* Products Grid */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                  className="glass-card rounded-2xl p-8"
+                  transition={{ duration: 0.8, delay: 0.1 }}
+                  className="mb-12"
                 >
-                  <h3 className="text-xl font-bold text-slate-900 mb-6">
-                    {isBusiness ? 'Make a Payment' : isCrowdfunder ? 'Support Campaign' : `Donate to ${pageData.name}`}
-                  </h3>
+                  <h2 className="text-3xl font-black text-slate-900 mb-8">Products & Services</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Product Cards - Using dummy data */}
+                    {[
+                      {
+                        id: 1,
+                        name: "Premium Service",
+                        price: 299,
+                        description: "Get our premium service package with full support",
+                        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop"
+                      },
+                      {
+                        id: 2,
+                        name: "Consultation",
+                        price: 150,
+                        description: "1-hour consultation session with our experts",
+                        image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop"
+                      },
+                      {
+                        id: 3,
+                        name: "Basic Package",
+                        price: 99,
+                        description: "Essential services to get you started",
+                        image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=300&fit=crop"
+                      }
+                    ].map((product, index) => (
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="glass-card rounded-2xl overflow-hidden hover:shadow-xl transition-all group"
+                      >
+                        <div className="relative h-48 overflow-hidden">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                        </div>
+                        <div className="p-6">
+                          <h3 className="text-xl font-bold text-slate-900 mb-2">{product.name}</h3>
+                          <p className="text-slate-600 text-sm mb-4">{product.description}</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-2xl font-black text-slate-900">${product.price}</span>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => setAmount(product.price.toString())}
+                              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-shadow"
+                            >
+                              Select
+                            </motion.button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Payment Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                  className="glass-card rounded-2xl p-8 max-w-2xl mx-auto"
+                >
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6">Make a Payment</h3>
 
                   <div className="space-y-6">
                     {/* Amount Input */}
@@ -1030,7 +1063,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-                        placeholder="Enter amount"
+                        placeholder="Enter amount or select a product above"
                         min="1"
                       />
                     </div>
@@ -1038,14 +1071,14 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                     {/* Message Input */}
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-2">
-                        {isBusiness ? 'Notes (optional)' : 'Message (optional)'}
+                        Order Notes (optional)
                       </label>
                       <textarea
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         rows={3}
-                        placeholder={isBusiness ? 'Add order notes or special instructions...' : isCrowdfunder ? 'Leave a message of support...' : 'Leave a message...'}
+                        placeholder="Add order notes or special instructions..."
                       />
                     </div>
 
@@ -1066,7 +1099,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                         ? `Pay $${amount || '0'}`
                         : isCrowdfunder
                         ? `Support $${amount || '0'}`
-                        : `Donate $${amount || '0'}`}
+                        : `Pay $${amount || '0'}`}
                     </motion.button>
 
                     {/* Quick Amount Buttons */}
@@ -1166,6 +1199,104 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                 </motion.div>
               </div>
             </div>
+          ) : (
+            // Centered layout for creator and crowdfunder roles
+            <div className={`flex justify-center ${
+              (roleFromUrl === 'creator' && layoutFromUrl === 'creative') ||
+              (roleFromUrl === 'crowdfunder' && layoutFromUrl === 'milestone')
+                ? 'pt-16'
+                : ''
+            }`}>
+              <div className="w-full max-w-4xl">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  className="glass-card rounded-2xl p-8"
+                >
+                  <h3 className="text-xl font-bold text-slate-900 mb-6">
+                    {isCrowdfunder ? 'Support Campaign' : `Pay ${pageData.name}`}
+                  </h3>
+
+                  <div className="space-y-6">
+                    {/* Amount Input */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        Amount ($)
+                      </label>
+                      <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                        placeholder="Enter amount"
+                        min="1"
+                      />
+                    </div>
+
+                    {/* Message Input */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        Message (optional)
+                      </label>
+                      <textarea
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows={3}
+                        placeholder={isCrowdfunder ? 'Leave a message of support...' : 'Leave a message...'}
+                      />
+                    </div>
+
+                    {/* Payment Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleSupport}
+                      disabled={!amount || parseFloat(amount) <= 0}
+                      className={`w-full py-4 rounded-xl font-semibold text-lg transition-all ${
+                        amount && parseFloat(amount) > 0
+                          ? 'hover:shadow-lg text-white'
+                          : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      }`}
+                      style={amount && parseFloat(amount) > 0 ? { backgroundColor: pageData.theme } : {}}
+                    >
+                      {isCrowdfunder
+                        ? `Support $${amount || '0'}`
+                        : `Pay $${amount || '0'}`}
+                    </motion.button>
+
+                    {/* Quick Amount Buttons */}
+                    <div className="grid grid-cols-3 gap-2">
+                      {[10, 25, 50].map((quickAmount) => (
+                        <motion.button
+                          key={quickAmount}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setAmount(quickAmount.toString())}
+                          className="py-2 px-3 bg-white/50 text-slate-700 rounded-lg font-medium hover:bg-white/80 transition-colors border border-slate-200"
+                        >
+                          ${quickAmount}
+                        </motion.button>
+                      ))}
+                    </div>
+
+                    {/* Payment Methods Info */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                      <div className="flex items-start space-x-3">
+                        <Globe className="w-5 h-5 text-blue-600 mt-1" />
+                        <div>
+                          <h4 className="font-semibold text-blue-900 mb-1">Universal Payments</h4>
+                          <p className="text-blue-700 text-sm">
+                            Pay with card, bank transfer, or crypto. All payments go directly to {pageData.name}'s wallet.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -1191,7 +1322,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                 Choose Payment Method
               </h3>
                              <p className="text-slate-600">
-                 {roleFromUrl === 'business' ? `Pay ${pageData.name}` : roleFromUrl === 'crowdfunder' ? `Support ${pageData.name}` : `Donate to ${pageData.name}`} with ${amount}
+                 {roleFromUrl === 'business' ? `Pay ${pageData.name}` : roleFromUrl === 'crowdfunder' ? `Support ${pageData.name}` : `Pay ${pageData.name}`} with ${amount}
                </p>
             </div>
 
