@@ -77,69 +77,18 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href={logoHref}>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center space-x-3 cursor-pointer"
-            >
-              <div className="w-10 h-10 primary-gradient rounded-xl flex items-center justify-center shadow-lg">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-black text-slate-900 dark:text-white">
-                OnClick
-              </span>
-            </motion.div>
+            <span className="text-2xl italic font-extrabold tracking-tight text-blue-700 dark:text-white select-none">OnClick</span>
           </Link>
 
-          {/* Desktop Navigation - Removed for now */}
 
           {/* Right side buttons */}
           <div className="flex items-center space-x-4">
             {/* Wallet Button */}
             <WalletButton />
 
-            {/* Theme Toggle */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={currentToggleTheme}
-              className="p-3 rounded-xl bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 transition-colors shadow-sm"
-            >
-              {currentIsDark ? (
-                <Sun className="w-5 h-5 text-amber-500" />
-              ) : (
-                <Moon className="w-5 h-5 text-slate-600 dark:text-gray-300" />
-              )}
-            </motion.button>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-3 rounded-xl bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 transition-colors shadow-sm"
-            >
-              {isMenuOpen ? (
-                <X className="w-5 h-5 text-slate-600 dark:text-gray-300" />
-              ) : (
-                <Menu className="w-5 h-5 text-slate-600 dark:text-gray-300" />
-              )}
-            </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden py-6 border-t border-white/20 dark:border-gray-700/20"
-          >
-            <div className="flex flex-col space-y-4">
-              <div className="pt-2">
-                <WalletButton />
-              </div>
-            </div>
-          </motion.div>
-        )}
       </div>
     </motion.nav>
   );

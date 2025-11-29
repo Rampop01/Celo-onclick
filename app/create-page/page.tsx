@@ -799,10 +799,10 @@ function CreatePageContent() {
                         value={formData.walletAddress}
                         onChange={(e) => handleInputChange('walletAddress', e.target.value)}
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Enter your Polkadot wallet address"
+                        placeholder="Enter your Celo or MiniPay wallet address"
                       />
                       <p className="text-sm text-slate-500 mt-2">
-                        Payments will be sent directly to this address. No custodial holds.
+                        Payments will be sent directly to this Celo/MiniPay address. No custodial holds.
                       </p>
                     </div>
 

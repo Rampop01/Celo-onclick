@@ -101,8 +101,8 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
     deadline: onChainPage.deadline > 0 ? new Date(Number(onChainPage.deadline) * 1000).toISOString() : '',
     theme: '#4A9BC7', // Default theme
     title: `Welcome to ${handleFromUrl}'s page`,
-    description: 'Accept payments with ease using OnClick.',
-    banner: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&h=400&fit=crop',
+    description: onChainPage.description || 'Accept payments with ease using OnClick.',
+    banner: onChainPage.banner && onChainPage.banner.startsWith('http') ? onChainPage.banner : 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&h=400&fit=crop',
     avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
   } : {
     name: handleFromUrl || 'Demo Page',
@@ -350,43 +350,40 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="glass-card rounded-2xl p-8 shadow-xl bg-white"
+              className="glass-card rounded-2xl p-4 sm:p-8 shadow-xl bg-white"
             >
               <div>
-                <div className="flex items-center space-x-2 mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-2 space-y-2 sm:space-y-0">
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold capitalize">
                     {pageData.role}
                   </span>
-                  {onChainPage?.exists && (
-                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-                      ✓ On-Chain
-                    </span>
-                  )}
                 </div>
-                <h1 className="text-4xl font-bold text-slate-900 mb-3">@{pageData.handle}</h1>
-                <p className="text-xl text-slate-600 mb-4">{pageData.title}</p>
-                <p className="text-slate-700 leading-relaxed">{pageData.description}</p>
+                <h1 className="text-2xl sm:text-4xl font-bold text-slate-900 mb-2 sm:mb-3 break-words">@{pageData.handle}</h1>
+                <p className="text-base sm:text-xl text-slate-600 mb-2 sm:mb-4 break-words">{pageData.title}</p>
+                <p className="text-slate-700 leading-relaxed text-sm sm:text-base break-words">{pageData.description}</p>
                 
-                {/* Stats Row */}
-                <div className="flex items-center space-x-6 mt-6 pt-6 border-t border-slate-200">
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="w-5 h-5 text-green-600" />
-                    <span className="font-bold text-slate-900">${pageData.raised.toFixed(2)}</span>
-                    <span className="text-slate-500">raised</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Users className="w-5 h-5 text-blue-600" />
-                    <span className="font-bold text-slate-900">{pageData.supporters}</span>
-                    <span className="text-slate-500">supporters</span>
-                  </div>
-                  {showProgressBar && pageData.goal > 0 && (
+                {/* Stats Row (only for crowdfunder) */}
+                {pageData.role === 'crowdfunder' && (
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 mt-6 pt-6 border-t border-slate-200 space-y-4 sm:space-y-0">
                     <div className="flex items-center space-x-2">
-                      <Target className="w-5 h-5 text-purple-600" />
-                      <span className="font-bold text-slate-900">${pageData.goal.toFixed(0)}</span>
-                      <span className="text-slate-500">goal</span>
+                      <DollarSign className="w-5 h-5 text-green-600" />
+                      <span className="font-bold text-slate-900">${pageData.raised.toFixed(2)}</span>
+                      <span className="text-slate-500">raised</span>
                     </div>
-                  )}
-                </div>
+                    <div className="flex items-center space-x-2">
+                      <Users className="w-5 h-5 text-blue-600" />
+                      <span className="font-bold text-slate-900">{pageData.supporters}</span>
+                      <span className="text-slate-500">supporters</span>
+                    </div>
+                    {showProgressBar && pageData.goal > 0 && (
+                      <div className="flex items-center space-x-2">
+                        <Target className="w-5 h-5 text-purple-600" />
+                        <span className="font-bold text-slate-900">${pageData.goal.toFixed(0)}</span>
+                        <span className="text-slate-500">goal</span>
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 {/* Progress Bar */}
                 {showProgressBar && (
@@ -399,7 +396,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                         className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"
                       />
                     </div>
-                    <p className="text-sm text-slate-600 mt-2">
+                    <p className="text-xs sm:text-sm text-slate-600 mt-2">
                       {Math.round(progressPercentage)}% of goal reached
                     </p>
                   </div>
@@ -575,7 +572,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg"
+                    className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg"
                   >
                     <Plus className="w-5 h-5" />
                     <span>Create Your Own Page</span>

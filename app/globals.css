@@ -49,6 +49,30 @@ body {
   .primary-gradient {
     background: linear-gradient(135deg, #8CCDEB 0%, #6BB6D6 100%);
   }
+  .glass-card {
+    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-md;
+  }
+}
+
+@media (max-width: 640px) {
+  nav, .glass-card {
+    border-radius: 0 0 1.5rem 1.5rem;
+    min-height: 56px;
+  }
+  .primary-gradient {
+    border-radius: 0.75rem;
+  }
+  .navbar-link, .navbar-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 1.1rem;
+  }
+  .mobile-menu {
+    border-radius: 0 0 1.5rem 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
   
   .shiny-black {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
@@ -105,4 +129,3 @@ body {
     background: var(--shiny-black-light);
     transform: translateY(-2px);
   }
-}

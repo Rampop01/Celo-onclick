@@ -251,12 +251,6 @@ export default function LandingPage() {
                 Create Your Page
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
-              <Link
-                href="/public-page"
-                className="inline-flex items-center justify-center rounded-full border border-white/60 bg-transparent px-8 py-4 text-lg font-semibold text-white hover:bg-white/10 transition-all"
-              >
-                Explore Creators
-              </Link>
             </motion.div>
           </div>
         </section>
@@ -397,15 +391,27 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="relative z-20 mx-auto mt-20 h-[500px] w-full max-w-6xl px-4">
-            {/* Top row - 3 cards evenly spaced */}
-            <DiamondCard feature={features[0]} index={0} positionClass="left-[8%] top-0" />
-            <DiamondCard feature={features[1]} index={1} positionClass="left-1/2 -translate-x-1/2 top-0" />
-            <DiamondCard feature={features[2]} index={2} positionClass="right-[8%] top-0" />
-            
-            {/* Bottom row - 2 cards positioned in the gaps between top cards */}
-            <DiamondCard feature={features[3]} index={3} positionClass="left-[25%] top-[260px]" />
-            <DiamondCard feature={features[4]} index={4} positionClass="right-[25%] top-[260px]" />
+          {/* Responsive Why Choose OnClick section */}
+          <div className="relative z-20 mx-auto mt-20 w-full max-w-6xl px-4">
+            {/* Mobile: vertical stack, Desktop: diamond layout */}
+            <div className="block md:hidden space-y-6">
+              {features.map((feature, idx) => (
+                <div key={feature.title} className="rounded-2xl bg-white shadow-lg border px-6 py-8 text-center">
+                  <div className="flex justify-center mb-4">{feature.icon}</div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">{feature.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
+                </div>
+              ))}
+            </div>
+            <div className="hidden md:block relative h-[500px] w-full">
+              {/* Top row - 3 cards evenly spaced */}
+              <DiamondCard feature={features[0]} index={0} positionClass="left-[8%] top-0" />
+              <DiamondCard feature={features[1]} index={1} positionClass="left-1/2 -translate-x-1/2 top-0" />
+              <DiamondCard feature={features[2]} index={2} positionClass="right-[8%] top-0" />
+              {/* Bottom row - 2 cards positioned in the gaps between top cards */}
+              <DiamondCard feature={features[3]} index={3} positionClass="left-[25%] top-[260px]" />
+              <DiamondCard feature={features[4]} index={4} positionClass="right-[25%] top-[260px]" />
+            </div>
           </div>
         </section>
 
