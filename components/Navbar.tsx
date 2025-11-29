@@ -47,34 +47,25 @@ export default function Navbar() {
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  // Get the handle from the current path or localStorage
+  // Get the handle from the current path only (no localStorage)
   const getHandle = () => {
     if (typeof window !== 'undefined') {
       // Check if we're on a handle route (not /, /role-selection, /create-page, etc.)
       const path = pathname || window.location.pathname;
-      if (path && path !== '/' && !path.startsWith('/role-selection') && !path.startsWith('/create-page') && !path.startsWith('/public-page') && !path.startsWith('/business-dashboard') && !path.startsWith('/creator-dashboard') && !path.startsWith('/crowdfunder-dashboard')) {
+      const reservedPaths = ['/', '/role-selection', '/create-page', '/public-page', '/business-dashboard', '/freelancer-dashboard', '/crowdfunder-dashboard', '/handle-selection'];
+      if (path && !reservedPaths.some(reserved => path === reserved || path.startsWith(reserved + '/'))) {
         // Extract handle from path (remove leading slash)
         const handle = path.replace(/^\//, '');
-        if (handle) {
+        if (handle && !handle.includes('/')) {
           return handle;
         }
-      }
-      // Fallback: try to get handle from localStorage
-      try {
-        const saved = localStorage.getItem('onclick_page_data');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          return parsed.handle;
-        }
-      } catch (e) {
-        // Ignore errors
       }
     }
     return null;
   };
 
   const handle = getHandle();
-  const logoHref = handle ? `/${handle}` : '/';
+  const logoHref = '/';
 
   return (
     <motion.nav

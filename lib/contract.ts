@@ -9,10 +9,11 @@ import onClickAbi from './onclick-abi.json';
 
 /**
  * Celo Sepolia Testnet Chain Definition
- * Chain ID: 11142220 (0xA981EC)
+ * Chain ID: 11142220 (0xA9EC5C)
+ * Note: Celo Sepolia is the new testnet, replacing Alfajores
  */
 export const celoSepolia = defineChain({
-  id: 11142220, // Correct Celo Sepolia chain ID (not 84532 which is Base Sepolia)
+  id: 11142220, // Celo Sepolia chain ID
   name: 'Celo Sepolia Testnet',
   network: 'celo-sepolia',
   nativeCurrency: {
@@ -22,16 +23,24 @@ export const celoSepolia = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://rpc.ankr.com/celo_sepolia'],
+      http: [
+        'https://forno.celo-sepolia.celo-testnet.org', // Primary - Official Celo Sepolia RPC
+        'https://alfajores-forno.celo-testnet.org', // Backup 1 - Alfajores (compatible)
+        'https://celo-sepolia.blockscout.com/api/eth-rpc', // Backup 2 - Blockscout
+      ],
     },
     public: {
-      http: ['https://rpc.ankr.com/celo_sepolia'],
+      http: [
+        'https://forno.celo-sepolia.celo-testnet.org',
+        'https://alfajores-forno.celo-testnet.org',
+        'https://celo-sepolia.blockscout.com/api/eth-rpc',
+      ],
     },
   },
   blockExplorers: {
     default: {
       name: 'Celo Sepolia Explorer',
-      url: 'https://sepolia.celoscan.io',
+      url: 'https://sepolia.celoscan.io', // CeloScan Sepolia
     },
   },
   testnet: true,

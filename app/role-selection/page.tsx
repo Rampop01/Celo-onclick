@@ -69,6 +69,17 @@ export default function RoleSelection() {
 
   const handleConfirm = () => {
     if (selectedRole) {
+      // Clear any old page data before starting fresh
+      if (typeof window !== 'undefined') {
+        console.log('🆕 Starting fresh page creation - clearing old data');
+        localStorage.removeItem('onclick_page_data');
+        // Clear all page-specific data
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('onclick_page_')) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
       // Navigate to handle selection page instead of directly to create page
       router.push(`/handle-selection?role=${selectedRole}`);
     }

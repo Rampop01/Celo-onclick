@@ -47,12 +47,31 @@ function CreatePageContent() {
   const { createPage, isPending: isCreating, isConfirming, isSuccess: isPageCreated, error: createError, hash } = useCreatePage();
   
   // Get saved data from localStorage (from handle selection page)
+  // ONLY if wallet matches and we're not starting fresh
   const getSavedData = () => {
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem('onclick_page_data');
         if (saved) {
-          return JSON.parse(saved);
+          const parsedData = JSON.parse(saved);
+          
+          // If we have wallet data saved, check if it matches current wallet
+          // This prevents seeing old data when switching wallets
+          if (parsedData.walletAddress && address && 
+              parsedData.walletAddress.toLowerCase() !== address.toLowerCase()) {
+            console.log('🔄 Wallet mismatch - clearing old data');
+            localStorage.removeItem('onclick_page_data');
+            return null;
+          }
+          
+          // If coming fresh from role selection (no handle in URL), don't load old data
+          if (!handleFromUrl && !stepFromUrl) {
+            console.log('🆕 Fresh start - clearing old data');
+            localStorage.removeItem('onclick_page_data');
+            return null;
+          }
+          
+          return parsedData;
         }
       } catch (e) {
         console.error('Error reading saved data:', e);
@@ -99,28 +118,54 @@ function CreatePageContent() {
   // Handle successful page creation
   useEffect(() => {
     if (isPageCreated && hash) {
-      // Save form data to localStorage
-      if (typeof window !== 'undefined' && formData.handle) {
-        localStorage.setItem(`onclick_page_${formData.handle}`, JSON.stringify({
-          ...formData,
-          contractTxHash: hash,
-          published: true
-        }));
-        localStorage.setItem('onclick_page_data', JSON.stringify(formData));
-        sessionStorage.setItem(`onclick_page_owner_${formData.handle}`, 'true');
-        sessionStorage.setItem('onclick_page_owner', 'true');
+      // Clear localStorage after successful publish - data is now on blockchain
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('onclick_page_data');
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('onclick_page_')) {
+            localStorage.removeItem(key);
+          }
+        });
       }
-      // Show success modal briefly then navigate
+      // Show success modal briefly then navigate to the published page
+      // The public page will read data from blockchain
       setTimeout(() => {
         router.push(`/${formData.handle}`);
       }, 2000);
     }
   }, [isPageCreated, hash, formData.handle, router]);
 
+  // Clear old data when wallet changes (prevents seeing previous user's data)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && address) {
+      const saved = localStorage.getItem('onclick_page_data');
+      if (saved) {
+        try {
+          const parsedData = JSON.parse(saved);
+          if (parsedData.walletAddress && 
+              parsedData.walletAddress.toLowerCase() !== address.toLowerCase()) {
+            console.log('🔄 Wallet changed - clearing old page data');
+            localStorage.removeItem('onclick_page_data');
+            // Also clear specific page data
+            Object.keys(localStorage).forEach(key => {
+              if (key.startsWith('onclick_page_')) {
+                localStorage.removeItem(key);
+              }
+            });
+          }
+        } catch (e) {
+          console.error('Error checking saved data:', e);
+        }
+      }
+    }
+  }, [address]);
+
   // Reload saved data when component mounts or when navigating back from preview
+  // ONLY if it passes validation (same wallet, or we're resuming)
   useEffect(() => {
     const saved = getSavedData();
     if (saved) {
+      console.log('✅ Loading saved page data:', saved.handle);
       setFormData(prev => ({
         ...prev,
         name: saved.name || prev.name,
@@ -135,6 +180,8 @@ function CreatePageContent() {
         deadline: saved.deadline || prev.deadline,
         businessType: saved.businessType || prev.businessType
       }));
+    } else {
+      console.log('🆕 Starting fresh page creation');
     }
   }, []);
 
@@ -200,7 +247,7 @@ function CreatePageContent() {
     }
   };
 
-  const currentRoleConfig = roleConfig[formData.role as keyof typeof roleConfig] || roleConfig.creator;
+  const currentRoleConfig = roleConfig[formData.role as keyof typeof roleConfig] || roleConfig.freelancer;
 
   const steps = [
     { id: 1, title: 'Basic Info', icon: <User className="w-5 h-5" /> },
@@ -850,28 +897,21 @@ function CreatePageContent() {
 
               <div className="flex items-center space-x-4">
                 {currentStep === 4 && (
-                  <Link href={formData.handle ? `/${formData.handle}` : `/public-page?role=${formData.role}&layout=${formData.layout}&owner=true`}>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        // Save form data to localStorage so public page can access it
-                        if (typeof window !== 'undefined' && formData.handle) {
-                          // Save by handle for handle-based routing
-                          localStorage.setItem(`onclick_page_${formData.handle}`, JSON.stringify(formData));
-                          // Also save to general key for backward compatibility
-                          localStorage.setItem('onclick_page_data', JSON.stringify(formData));
-                          // Set flag to indicate user is the page owner
-                          sessionStorage.setItem(`onclick_page_owner_${formData.handle}`, 'true');
-                          sessionStorage.setItem('onclick_page_owner', 'true');
-                        }
-                      }}
-                      className="flex items-center space-x-2 px-6 py-3 bg-white text-slate-700 border border-slate-200 rounded-xl font-semibold hover:bg-slate-50 transition-all"
-                    >
-                      <Eye className="w-5 h-5" />
-                      <span>Preview Page</span>
-                    </motion.button>
-                  </Link>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      // Show a preview info message - page needs to be published first
+                      toast.success('Publish your page to see it live! Your page will be viewable at: onclick/' + formData.handle, {
+                        duration: 4000,
+                        icon: '👁️'
+                      });
+                    }}
+                    className="flex items-center space-x-2 px-6 py-3 bg-white text-slate-700 border border-slate-200 rounded-xl font-semibold hover:bg-slate-50 transition-all"
+                  >
+                    <Eye className="w-5 h-5" />
+                    <span>Preview Info</span>
+                  </motion.button>
                 )}
 
                 <motion.button

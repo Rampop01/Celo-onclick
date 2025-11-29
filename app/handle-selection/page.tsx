@@ -136,6 +136,17 @@ function HandleSelectionContent() {
 
   const handleContinue = () => {
     if (name.trim() && handle.trim() && handleAvailability === 'available') {
+      // Clear old page data before creating new page
+      if (typeof window !== 'undefined') {
+        console.log('🆕 Creating new page - clearing old data');
+        localStorage.removeItem('onclick_page_data');
+        // Clear all page-specific data
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('onclick_page_')) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
       // Pass data via URL params - will be saved on-chain in create-page
       router.push(`/create-page?role=${roleFromUrl}&name=${encodeURIComponent(name.trim())}&handle=${encodeURIComponent(handle.trim())}`);
     }
