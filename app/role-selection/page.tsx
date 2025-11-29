@@ -100,12 +100,12 @@ export default function RoleSelection() {
           >
             <div className="flex items-center justify-center mb-6">
               <Sparkles className="w-8 h-8 text-blue-500 mr-3" />
-              <h1 className="text-4xl md:text-6xl font-bold text-slate-900">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-slate-900">
                 Choose Your Role
               </h1>
               <Sparkles className="w-8 h-8 text-blue-500 ml-3" />
             </div>
-            <p className="text-xl md:text-2xl text-slate-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-2xl text-slate-600 max-w-2xl mx-auto">
               Create your personalized payment page in minutes
             </p>
           </motion.div>
@@ -122,7 +122,7 @@ export default function RoleSelection() {
       {/* Role Cards */}
       <section className="pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {roles.map((role, index) => (
               <motion.div
                 key={role.id}
@@ -147,7 +147,7 @@ export default function RoleSelection() {
                 <div className="relative z-10 flex flex-col h-full">
                   {/* Title & Subtitle */}
                   <div className="mb-4">
-                    <h3 className="text-3xl font-bold text-slate-900 mb-1">
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-1">
                       {role.title}
                     </h3>
                     <p className="text-sm text-slate-500 font-medium">
@@ -156,7 +156,7 @@ export default function RoleSelection() {
                   </div>
 
                   {/* Description */}
-                  <p className="text-lg text-slate-700 mb-6 font-medium">
+                  <p className="text-base sm:text-lg text-slate-700 mb-6 font-medium">
                     {role.description}
                   </p>
 

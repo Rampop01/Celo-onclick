@@ -88,10 +88,12 @@ export function useRampPayment() {
         setIsRampOpen(false);
       });
 
-      ramp.on('WIDGET_CLOSE', () => {
-        console.log('Ramp widget closed');
-        setIsRampOpen(false);
-        config.onClose?.();
+      ramp.on('*', (event: any) => {
+        if (event.type === 'WIDGET_CLOSE') {
+          console.log('Ramp widget closed');
+          setIsRampOpen(false);
+          config.onClose?.();
+        }
       });
 
       ramp.show();

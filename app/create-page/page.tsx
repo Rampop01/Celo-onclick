@@ -406,7 +406,8 @@ function CreatePageContent() {
             transition={{ delay: 0.2 }}
             className="mb-12"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200 gap-2 sm:gap-0 py-2">
+
               {steps.map((step, index) => (
                 <div key={step.id} className="flex items-center">
                   <motion.div
@@ -818,7 +819,7 @@ function CreatePageContent() {
                             <li>• Credit/debit cards (via Transak)</li>
                             <li>• Bank transfers</li>
                             <li>• Mobile money</li>
-                            <li>• Crypto (USDC, DOT)</li>
+                            <li>• Crypto (USDC)</li>
                           </ul>
                         </div>
                       </div>

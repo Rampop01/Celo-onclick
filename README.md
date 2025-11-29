@@ -1,6 +1,6 @@
-# OnClick - Web3 Payment Platform UI
+# OnClick Web3 Payment Platform
 
-A complete, modern, and responsive Web3 payment platform UI built with Next.js 16, TypeScript, and Tailwind CSS. OnClick is a decentralized platform that lets creators, crowdfunders, and businesses receive crypto payments or donations easily, globally, and instantly.
+A modern, mobile-first payment platform built with Next.js 16, TypeScript, and Tailwind CSS. OnClick enables creators, crowdfunders, and businesses to receive global payments in USDC on Celo/MiniPay with ease.
 
 ## 🚀 Features
 
@@ -57,18 +57,24 @@ onclick/
 
 ## 🚀 Getting Started
 
-1. **Install dependencies**:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Rampop01/Celo-onclick.git
+   cd Celo-onclick/onclick
+   ```
+
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-2. **Run the development server**:
-```bash
-npm run dev
+3. **Run the development server:**
+   ```bash
+   npm run dev
    ```
 
-3. **Open your browser**:
-   Navigate to [http://localhost:3000](http://localhost:3000)
+4. **Open your browser:**
+   Visit [http://localhost:3000](http://localhost:3000)
 
 ## 🎯 User Journey
 

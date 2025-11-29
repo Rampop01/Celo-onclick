@@ -101,8 +101,8 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
     deadline: onChainPage.deadline > 0 ? new Date(Number(onChainPage.deadline) * 1000).toISOString() : '',
     theme: '#4A9BC7', // Default theme
     title: `Welcome to ${handleFromUrl}'s page`,
-    description: onChainPage.description || 'Accept payments with ease using OnClick.',
-    banner: onChainPage.banner && onChainPage.banner.startsWith('http') ? onChainPage.banner : 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&h=400&fit=crop',
+    description: 'Accept payments with ease using OnClick.',
+    banner: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&h=400&fit=crop',
     avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
   } : {
     name: handleFromUrl || 'Demo Page',

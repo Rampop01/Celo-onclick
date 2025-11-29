@@ -107,7 +107,7 @@ export default function FreelancerDashboard() {
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Stats Cards */}
@@ -278,7 +278,7 @@ export default function FreelancerDashboard() {
                             freelancerData.theme === color ? 'border-gray-900 dark:border-white' : 'border-gray-300'
                           }`}
                           style={{ backgroundColor: color }}
-                          onClick={() => setCreatorData({ ...freelancerData, theme: color })}
+                          onClick={() => setFreelancerData({ ...freelancerData, theme: color })}
                         />
                       ))}
                     </div>
@@ -291,7 +291,7 @@ export default function FreelancerDashboard() {
                     </label>
                     <textarea
                       value={freelancerData.description}
-                      onChange={(e) => setCreatorData({ ...freelancerData, description: e.target.value })}
+                      onChange={(e) => setFreelancerData({ ...freelancerData, description: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       rows={4}
                     />
@@ -305,7 +305,7 @@ export default function FreelancerDashboard() {
                     <input
                       type="number"
                       value={freelancerData.goal}
-                      onChange={(e) => setCreatorData({ ...freelancerData, goal: parseInt(e.target.value) })}
+                      onChange={(e) => setFreelancerData({ ...freelancerData, goal: parseInt(e.target.value) })}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
