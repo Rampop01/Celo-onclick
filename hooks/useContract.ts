@@ -373,18 +373,21 @@ export function usePaymentFlow() {
 
   useEffect(() => {
     if (approveSuccess) {
+      console.log('[PaymentFlow] Approval succeeded, moving to paying step');
       setStep('paying');
     }
   }, [approveSuccess]);
 
   useEffect(() => {
     if (paySuccess) {
+      console.log('[PaymentFlow] Payment succeeded, moving to success step');
       setStep('success');
     }
   }, [paySuccess]);
 
   useEffect(() => {
     if (approveError) {
+      console.error('[PaymentFlow] Approval error:', approveError);
       setStep('error');
       setErrorMessage(approveError.message || 'Approval failed');
     }
@@ -392,6 +395,7 @@ export function usePaymentFlow() {
 
   useEffect(() => {
     if (payError) {
+      console.error('[PaymentFlow] Payment error:', payError);
       setStep('error');
       setErrorMessage(payError.message || 'Payment failed');
     }
@@ -401,11 +405,14 @@ export function usePaymentFlow() {
     try {
       setStep('idle');
       setErrorMessage('');
+      console.log('[PaymentFlow] Starting payment', { handle, amount, message });
 
       const amountInUSDC = toUSDCAmount(amount);
+      console.log('[PaymentFlow] Amount in USDC:', amountInUSDC.toString());
 
       // Check balance
       if (balance && balance < amountInUSDC) {
+        console.warn('[PaymentFlow] Insufficient USDC balance:', balance.toString());
         setStep('error');
         setErrorMessage('Insufficient USDC balance');
         return;
@@ -413,18 +420,22 @@ export function usePaymentFlow() {
 
       // Check allowance
       await refetchAllowance();
+      console.log('[PaymentFlow] Allowance:', allowance?.toString());
       
       if (!allowance || allowance < amountInUSDC) {
         // Need to approve
+        console.log('[PaymentFlow] Allowance too low, approving USDC...');
         setStep('approving');
         await approveUSDC(amountInUSDC);
         // Wait for approval success (handled by useEffect)
       } else {
         // Already approved, proceed to payment
+        console.log('[PaymentFlow] Allowance sufficient, making payment...');
         setStep('paying');
         await makePayment(handle, amount, message);
       }
     } catch (error: any) {
+      console.error('[PaymentFlow] startPayment error:', error);
       setStep('error');
       setErrorMessage(error.message || 'Payment failed');
     }

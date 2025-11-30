@@ -89,8 +89,29 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
     }
   };
 
-  // Page data from blockchain
-  const pageData = onChainPage?.exists ? {
+  // Try to get preview data from localStorage for owner/preview mode
+  let savedData: any = null;
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('onclick_page_data');
+      if (raw) savedData = JSON.parse(raw);
+    } catch {}
+  }
+  const pageData = isPreview && savedData ? {
+    name: savedData.name || handleFromUrl,
+    handle: savedData.handle || handleFromUrl,
+    role: savedData.role || roleFromUrl,
+    walletAddress: savedData.walletAddress || '',
+    raised: 0,
+    goal: savedData.goal || 0,
+    supporters: 0,
+    deadline: savedData.deadline || '',
+    theme: savedData.theme || '#4A9BC7',
+    title: `Welcome to ${savedData.name || handleFromUrl}'s page`,
+    description: savedData.description || 'Accept payments with ease using OnClick.',
+    banner: savedData.banner || 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&h=400&fit=crop',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+  } : onChainPage?.exists ? {
     name: handleFromUrl, // The handle is the name
     handle: onChainPage.handle,
     role: getRoleName(Number(onChainPage.role)),
@@ -298,21 +319,33 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                     <CheckCircle className="w-6 h-6 text-green-600" />
                     <div>
                       <p className="font-semibold text-green-900">You own this page!</p>
-                      <p className="text-sm text-green-700">
-                        Raised: ${pageData.raised.toFixed(2)} • {pageData.supporters} supporters
-                      </p>
+                      {pageData.role === 'crowdfunder' && (
+                        <p className="text-sm text-green-700">
+                          Raised: ${pageData.raised.toFixed(2)} • {pageData.supporters} supporters
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <Link href={`/create-page?handle=${handleFromUrl}&edit=true`}>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold"
-                    >
-                      <Edit className="w-4 h-4" />
-                      <span>Edit Page</span>
-                    </motion.button>
-                  </Link>
+                  <div className="flex flex-col gap-2 w-full max-w-xs sm:max-w-none sm:flex-row sm:gap-4">
+                    <Link href={`/create-page?handle=${handleFromUrl}&edit=true`}>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold w-full"
+                      >
+                        <Edit className="w-4 h-4" />
+                        <span>Edit Page</span>
+                      </motion.button>
+                    </Link>
+                    <Link href={`/transactions?handle=${handleFromUrl}`}>
+                      <button
+                        className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold w-full"
+                      >
+                        <DollarSign className="w-4 h-4" />
+                        <span>Transactions</span>
+                      </button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             ) : null}
@@ -585,42 +618,6 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
             )}
           </motion.div>
 
-          {/* Recent Payments */}
-          {onChainPayments && onChainPayments.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="glass-card rounded-2xl p-8 mt-8"
-            >
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Recent Supporters</h3>
-              <div className="space-y-4">
-                {onChainPayments.slice(0, 5).map((payment, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold">
-                        {payment.supporter.slice(2, 4).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="font-medium text-slate-900">
-                          {payment.supporter.slice(0, 6)}...{payment.supporter.slice(-4)}
-                        </p>
-                        {payment.message && (
-                          <p className="text-sm text-slate-500">"{payment.message}"</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-slate-900">${fromUSDCAmount(payment.amount).toFixed(2)}</p>
-                      <p className="text-xs text-slate-500">
-                        {new Date(Number(payment.timestamp) * 1000).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
         </div>
       </div>
 

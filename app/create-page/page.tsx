@@ -1000,7 +1000,7 @@ function CreatePageContent() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl text-center"
+              className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 md:p-8 w-full max-w-xs sm:max-w-sm md:max-w-md shadow-2xl text-center overflow-y-auto max-h-[90vh]"
             >
               {isCreating && (
                 <>
