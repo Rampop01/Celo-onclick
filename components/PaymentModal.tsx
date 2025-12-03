@@ -169,20 +169,20 @@ export default function PaymentModal({
             {/* Payment Details */}
             <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-6">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-600 dark:text-gray-400">Amount</span>
+                <span className="text-gray-600 dark:text-white">Amount</span>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">
                   {amount} {currency}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-400">To</span>
+                <span className="text-gray-600 dark:text-white">To</span>
                 <span className="text-gray-900 dark:text-white font-medium">
                   {recipient}
                 </span>
               </div>
               {isConnected && balance !== undefined && (
                 <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                  <span className="text-gray-600 dark:text-gray-400">Your Balance</span>
+                  <span className="text-gray-600 dark:text-white">Your Balance</span>
                   <span className="text-gray-900 dark:text-white font-medium">
                     {balanceFormatted.toFixed(2)} USDC
                   </span>
@@ -222,7 +222,7 @@ export default function PaymentModal({
                                 </span>
                               )}
                             </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                            <div className="text-sm text-gray-500 dark:text-white">
                               {method.description}
                             </div>
                           </div>
@@ -237,7 +237,7 @@ export default function PaymentModal({
 
                 {/* Optional Message */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
                     Add a message (optional)
                   </label>
                   <input
@@ -293,7 +293,7 @@ export default function PaymentModal({
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                   Approving USDC...
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-600 dark:text-white">
                   Please confirm the approval in your wallet
                 </p>
               </div>
@@ -306,7 +306,7 @@ export default function PaymentModal({
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                   Processing Payment...
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-600 dark:text-white">
                   Please confirm the transaction in your wallet
                 </p>
               </div>
@@ -325,7 +325,7 @@ export default function PaymentModal({
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                   Payment Successful!
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-gray-600 dark:text-white mb-4">
                   Your payment has been processed on the blockchain
                 </p>
               </div>
@@ -344,7 +344,7 @@ export default function PaymentModal({
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                   Payment Failed
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-sm mx-auto">
+                <p className="text-gray-600 dark:text-white mb-4 max-w-sm mx-auto">
                   {errorMessage || 'An error occurred while processing your payment'}
                 </p>
                 <motion.button
