@@ -3,7 +3,7 @@ out/
 cache/
 broadcast/
 lib/
-*.sol
+# *.sol
 
 # Dependencies
 node_modules/

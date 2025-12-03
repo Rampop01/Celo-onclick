@@ -26,8 +26,8 @@ November 20, 2024
 
 ### Configuration
 - **Network**: Celo Sepolia Testnet
-- **Chain ID**: 84532 (11142220 in some tools)
-- **RPC URL**: https://rpc.ankr.com/celo_sepolia
+- **Chain ID**: 11142220
+- **RPC URL**: https://forno.celo-sepolia.celo-testnet.org
 - **Explorer**: https://sepolia.celoscan.io
 
 ---
