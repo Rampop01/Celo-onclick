@@ -7,7 +7,8 @@ import { useAccount } from 'wagmi';
 import { useGetPage, useGetPayments, usePaymentFlow, useUSDCBalance } from '../../hooks/useContract';
 import { fromUSDCAmount, Role } from '../../lib/contract';
 import { isMiniPay } from '../../lib/minipay';
-import RampEmbedded from '../../components/RampEmbedded';
+import dynamic from 'next/dynamic';
+const FonbnkSandboxModal = dynamic(() => import('../../components/FonbnkSandboxModal'), { ssr: false });
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { 
@@ -54,7 +55,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [embedCodeCopied, setEmbedCodeCopied] = useState(false);
   const [isMiniPayUser, setIsMiniPayUser] = useState(false);
-  const [showRampWidget, setShowRampWidget] = useState(false);
+    const [showFonbnkWidget, setShowFonbnkWidget] = useState(false);
 
   // Get connected wallet address
   const { address: connectedAddress, isConnected } = useAccount();
@@ -186,14 +187,12 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
       alert('Please enter a valid amount');
       return;
     }
-    
     if (!onChainPage?.walletAddress && !connectedAddress) {
       alert('Recipient address not found');
       return;
     }
-    
     setIsPaymentModalOpen(false);
-    setShowRampWidget(true);
+    setShowFonbnkWidget(true);
   };
 
   // ============================================
@@ -627,6 +626,14 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
       {/* PAYMENT MODALS */}
       {/* ============================================ */}
 
+      {/* FonbnkSandboxModal for Fiat Onramp (Sandbox) */}
+      {showFonbnkWidget && (
+        <FonbnkSandboxModal 
+          onClose={() => setShowFonbnkWidget(false)}
+          recipient={onChainPage?.walletAddress || connectedAddress || ''}
+        />
+      )}
+
       {/* Payment Method Selection Modal */}
       {isPaymentModalOpen && (
         <motion.div
@@ -702,7 +709,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                 <div className="flex items-center space-x-3">
                   <Wallet className="w-8 h-8 text-blue-600" />
                   <div>
-                    <h4 className="font-semibold text-slate-900">Pay with USDC</h4>
+                    <h4 className="font-semibold text-slate-900">Pay with Crypto</h4>
                     <p className="text-sm text-slate-600">
                       {isConnected ? `Balance: ${balanceFormatted.toFixed(2)} USDC` : 'Connect wallet first'}
                     </p>
@@ -724,8 +731,8 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
                 <div className="flex items-center space-x-3">
                   <CreditCard className="w-8 h-8 text-purple-600" />
                   <div>
-                    <h4 className="font-semibold text-slate-900">Card / Bank</h4>
-                    <p className="text-sm text-slate-600">Via Ramp Network</p>
+                    <h4 className="font-semibold text-slate-900">Pay with Fiat</h4>
+                    <p className="text-sm text-slate-600">Card, Bank, or Mobile Money (Fonbnk)</p>
                   </div>
                 </div>
               </motion.button>
@@ -927,22 +934,7 @@ export function PublicPageContent({ handle: handleFromPath }: { handle?: string 
       )}
 
       {/* Ramp Widget (Fiat Payment) */}
-      {showRampWidget && amount && (
-        <RampEmbedded
-          amount={parseFloat(amount)}
-          recipientAddress={onChainPage?.walletAddress || connectedAddress || ''}
-          onClose={() => setShowRampWidget(false)}
-          onSuccess={() => {
-            console.log('✅ Ramp payment successful!');
-            refetchPage();
-            refetchPayments();
-            setShowRampWidget(false);
-            setAmount('');
-            setMessage('');
-          }}
-        />
-      )}
-    </div>
+          </div>
   );
 }
 
