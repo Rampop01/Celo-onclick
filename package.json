@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },
@@ -17,10 +17,12 @@
     "@reown/appkit-adapter-wagmi": "^1.8.14",
     "@tanstack/react-query": "^5.90.10",
     "framer-motion": "^12.23.24",
+    "ignore-loader": "^0.1.2",
     "lucide-react": "^0.546.0",
     "next": "^16.0.7",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "null-loader": "^4.0.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
     "react-qr-code": "^2.0.18",
@@ -29,7 +31,7 @@
     "wagmi": "^2.19.4"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
