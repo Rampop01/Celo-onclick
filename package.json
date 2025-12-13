@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+<<<<<<< HEAD
     "dev": "next dev",
+=======
+    "dev": "next dev --webpack",
+>>>>>>> 670310fe62fd379b83932a30e903e4f60fc6fd6e
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"
@@ -20,13 +24,20 @@
     "ignore-loader": "^0.1.2",
     "lucide-react": "^0.546.0",
     "next": "^16.0.7",
+<<<<<<< HEAD
     "null-loader": "^4.0.1",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
+=======
+    "pino": "7.11.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+>>>>>>> 670310fe62fd379b83932a30e903e4f60fc6fd6e
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
     "react-qr-code": "^2.0.18",
     "react-router-dom": "^7.9.4",
+    "thread-stream": "0.15.2",
     "viem": "^2.39.2",
     "wagmi": "^2.19.4"
   },
@@ -37,6 +48,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
+    "null-loader": "^4.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
-import { PublicPageContent } from '../public-page/page';
+import { PublicPageContent } from '../../components/PublicPageContent';
 
 function HandlePageContent({ params }: { params: Promise<{ handle: string }> }) {
   const [handle, setHandle] = useState<string>('');
