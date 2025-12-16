@@ -24,7 +24,9 @@ export function useCreatePage() {
     role: Role,
     walletAddress: string,
     goal: number = 0,
-    deadline: number = 0
+    deadline: number = 0,
+    imageIPFS: string,
+    descriptionIPFS: string
   ) => {
     // Check if wallet is connected and on the correct chain
     if (isConnected && chainId !== CHAIN.id) {
@@ -45,7 +47,7 @@ export function useCreatePage() {
     writeContract({
       ...ONCLICK_CONTRACT,
       functionName: 'createPage',
-      args: [handle, role, walletAddress, goalAmount, deadlineTimestamp],
+      args: [handle, role, walletAddress, goalAmount, deadlineTimestamp, imageIPFS, descriptionIPFS],
       chainId: CHAIN.id,
     });
   };

@@ -950,12 +950,36 @@ function CreatePageContent() {
                     const deadlineTimestamp = formData.deadline ? new Date(formData.deadline).getTime() : 0;
 
                     try {
+                      // IPFS upload logic
+                      const pinataJwt = process.env.NEXT_PUBLIC_PINATA_JWT as string;
+                      let imageCID = '';
+                      let descriptionCID = '';
+
+                      // Upload banner image if it's a file (not a URL or empty)
+                      if (formData.banner && formData.banner.startsWith('data:')) {
+                        const res = await fetch(formData.banner);
+                        const blob = await res.blob();
+                        const file = new File([blob], 'banner.png', { type: blob.type });
+                        const { uploadFileToIPFS } = await import('../../lib/ipfs');
+                        imageCID = await uploadFileToIPFS(file, pinataJwt);
+                      } else if (formData.banner) {
+                        imageCID = formData.banner; // fallback to existing URL
+                      }
+
+                      // Upload description as JSON
+                      if (formData.description) {
+                        const { uploadJSONToIPFS } = await import('../../lib/ipfs');
+                        descriptionCID = await uploadJSONToIPFS({ description: formData.description }, pinataJwt);
+                      }
+
                       await createPage(
                         formData.handle,
                         roleEnum,
                         formData.walletAddress,
                         goalAmount,
-                        deadlineTimestamp
+                        deadlineTimestamp,
+                        imageCID,
+                        descriptionCID
                       );
                       setShowPublishModal(true);
                     } catch (error: any) {

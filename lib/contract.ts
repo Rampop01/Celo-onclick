@@ -57,8 +57,8 @@ const IS_PRODUCTION = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production';
 export const CONTRACTS = {
   // Testnet (Celo Sepolia) - Use this for development
   testnet: {
-    onClick: '0x274f499201b0716e6CB632FF5BEc10cAD508eAD6', // ✅ Deployed!
-    usdc: '0xd9fc6cC979472A5FA52750ae26805462E1638872', // ✅ Mock USDC
+    onClick: '0xF03961Db1Ee8CB411d99F8f9badece63292a1E88', // ✅ Deployed!
+    usdc: '0x636D7CF8e0e3eC9B69C7179b1463330bB689CEE5', // ✅ Mock USDC
   },
   // Mainnet - Use this for production
   mainnet: {
