@@ -1,5 +1,9 @@
 # 📝 Deployed Contract Addresses
 
+## Celo Sepolia Testnet Addresses
+- OnClick: `0xF03961Db1Ee8CB411d99F8f9badece63292a1E88`
+- Mock USDC: `0x636D7CF8e0e3eC9B69C7179b1463330bB689CEE5`
+
 ## Celo Sepolia Testnet
 
 ### Deployment Date
